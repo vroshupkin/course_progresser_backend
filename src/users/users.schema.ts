@@ -10,6 +10,9 @@ export class User
     
     @Prop()
       lastName: string;
+
+    @Prop()
+      password: string;
 }
 
 export type UserDocument = HydratedDocument<User>;

@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './users.schema';
 import { UserDtoAdd } from './user.dto';
+import { InEqValidator } from 'src/common/validators';
 
 @Injectable()
 export class UsersService
@@ -17,13 +18,17 @@ export class UsersService
 
   async create(dto: UserDtoAdd) 
   {
-    console.log(dto);
     const createUser = new this.userModel(dto);
     
-    
-    console.log(createUser.schema);
-    
-    return createUser.save();
+    const pass_len = createUser.password.length;
+    const validator_res = 
+    [ 
+      InEqValidator(pass_len)('>')(8)('Пароль должен быть больше {$} символов'),
+      InEqValidator(pass_len)('<')(32)('Пароль должен быть меньше {$} символов'),
+    ]
+      .reduce((prev, curr) => prev + curr);
+
+    return validator_res;    
   }
 
   async findAll() 
@@ -37,6 +42,5 @@ export class UsersService
     return this.userModel.find({ firstName: firstName }).exec();
   }
 
+  
 }
-
-
