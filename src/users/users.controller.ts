@@ -16,19 +16,17 @@ export class UsersController
   }
 
 
-  @Get(':firstName')
-  async getUser(@Param() params: any)
+  @Get(':userName')
+  async getUser(@Param() params: {userName: string})
   {
-    
-    const user = await this.usersService.findOne(params['firstName']);
+    const user = await this.usersService.findOne(params.userName);
     console.log(user);
     
     if(user == null)
     {
-      return `Пользователя с именем = ${params.firstName} не найдено`;
+      return `Пользователя с именем = ${params.userName} не найдено`;
     }
      
-
     return this.usersService.findOne(params['firstName']);
   }
 
@@ -42,6 +40,8 @@ export class UsersController
     if(res.length != 0)
     {
       response.status(HttpStatus.BAD_REQUEST).send(res);   
+      
+      return new Promise(() => {});
     }
     
     response.send('Пользователь создан');
