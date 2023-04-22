@@ -1,3 +1,5 @@
+import { Document, Error } from 'mongoose';
+
 type TInequalityOperator = '>' | '<' | '>=' | '<=' | '=='
 
 type InequalityOperators = {
@@ -30,7 +32,7 @@ export const InEqValidator =
 
     return FormatingFactory('{$}')(toBe + '')(message); 
   };
-
+  
 
 const InequalityOperatorSelector = (operator: TInequalityOperator) => 
 {
@@ -47,3 +49,17 @@ const InequalityOperatorSelector = (operator: TInequalityOperator) =>
 }; 
 
 
+export const validateDocument = async (doc: Document): Promise<string> => 
+{
+  let str = '';
+  try
+  {
+    await doc.validate();
+  }
+  catch(err)
+  {
+    str += (err as Error.ValidationError).message;
+  }
+
+  return str;
+};
