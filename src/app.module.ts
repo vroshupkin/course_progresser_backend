@@ -9,20 +9,22 @@ import { UsersHttpModule } from './users/users-http.module';
 import { UsersController } from './users/users.controller';
 import { CatsModule } from './cats/cats.module';
 import { MongooseModule } from '@nestjs/mongoose'; 
+import { AuthController } from './auth/auth.controller';
+import { AuthModule } from './auth/auth.module';
 
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost/progresser')
+    MongooseModule.forRoot('mongodb://localhost/progresser'),
   ],
   
 })
-export class Database
+export class DatabaseModule
 {}
 
 
 @Module({
-  imports: [ CatsModule, Database, UsersModule ] 
+  imports: [ CatsModule, DatabaseModule, UsersModule, AuthModule ] 
 })
 export class AppModule 
 {}

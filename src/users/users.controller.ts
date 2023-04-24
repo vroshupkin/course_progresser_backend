@@ -1,7 +1,8 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Req, Res } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { UserDtoAdd } from './user.dto';
+import { CreateResponseError, CreateResponseFail, CreateResponseSuccess, UserDtoAdd } from './user.dto';
 import { Response } from 'express';
+import { ErrorResponses } from 'src/common/common.types';
 
 @Controller('users')
 export class UsersController
@@ -12,14 +13,14 @@ export class UsersController
   @Get('all')
   async getUsers()
   { 
-    return this.usersService.findAll();
+    return this.usersService.FindAll();
   }
 
 
   @Get(':userName')
   async getUser(@Param() params: {userName: string})
   {
-    const user = await this.usersService.findOne(params.userName);
+    const user = await this.usersService.FindOne(params.userName);
     console.log(user);
     
     if(user == null)
@@ -27,7 +28,7 @@ export class UsersController
       return `Пользователя с именем = ${params.userName} не найдено`;
     }
      
-    return this.usersService.findOne(params['firstName']);
+    return this.usersService.FindOne(params['firstName']);
   }
 
 
@@ -35,16 +36,16 @@ export class UsersController
   @HttpCode(201)
   async createUser(@Body() userDtoAdd: UserDtoAdd, @Res() response: Response)
   {
-    const res = await this.usersService.create(userDtoAdd);
+    const res = await this.usersService.Create(userDtoAdd);
 
-    if(res.length != 0)
+    if(res instanceof CreateResponseFail ||  res instanceof ErrorResponses)
     {
       response.status(HttpStatus.BAD_REQUEST).send(res);   
       
-      return new Promise(() => {});
+      return; 
     }
     
-    response.send('Пользователь создан');
+    response.send(res);
   }
 
 }

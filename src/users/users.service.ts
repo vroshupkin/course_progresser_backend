@@ -2,9 +2,10 @@ import { Model, Document } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './users.schema';
-import { UserDtoAdd } from './user.dto';
+import { CreateRequest, CreateResponseError, CreateResponseErrorUserExist, CreateResponseFail, CreateResponseSuccess, UserDtoAdd } from './user.dto';
 import { InEqValidator, validateDocument } from 'src/common/validators';
 import { Error } from 'mongoose';
+import { GreaterThanValidator, LessThanValidator } from 'src/common/validator_error';
 
 
 @Injectable()
@@ -18,9 +19,18 @@ export class UsersService
     
   }
 
-  async create(dto: UserDtoAdd) 
+  async Create(request: CreateRequest) 
   {
-    const createUser = new this.userModel(dto);
+    
+    if(await this.FindOne(request.userName) != null)
+    {
+      console.log('user exist');
+      
+      return new CreateResponseErrorUserExist();
+    }
+
+
+    const createUser = new this.userModel(request);
 
     const schemaValidate = await validateDocument(createUser);
     if(schemaValidate.length > 0)
@@ -30,25 +40,36 @@ export class UsersService
 
     const pass_len = createUser.password.length;
     const validator_res = 
-    [ 
-      InEqValidator(pass_len)('>')(8)('Пароль должен быть больше {$} символов'),
-      InEqValidator(pass_len)('<')(32)('Пароль должен быть меньше {$} символов'),
-      
+    [       
+      GreaterThanValidator(pass_len, 6)('Пароль должен быть больше 6 символов'),
+      LessThanValidator(pass_len, 32)('Пароль должен быть меньше 32 символов'),
     ]
-      .reduce((prev, curr) => prev + curr + '\n');
+      .filter(v => v != null);
 
-    return validator_res;    
+    
+    if(validator_res.length > 0)
+    {
+      return new CreateResponseFail(validator_res);
+    }
+    
+    createUser.save();
+    if(await this.FindOne(createUser.userName) != null)
+    {
+      return new CreateResponseSuccess();      
+    }
+    
+    return new CreateResponseError();    
   }
 
-  async findAll() 
+  async FindAll() 
   {
     return this.userModel.find().exec();
   }
 
 
-  async findOne(userName: string) 
+  async FindOne(userName: string) 
   {
-    return this.userModel.find({ userName }).exec();
+    return this.userModel.findOne({ userName }).exec();
   }
 
   
