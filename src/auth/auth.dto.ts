@@ -1,15 +1,17 @@
-import { ErrorResponses, ResponseStatus, ResponseValidatorError, SuccessResponse } from 'src/common/common.types';
+import { ErrorResponse, ResponseStatus, ResponseValidatorError, SuccessRespons } from 'src/common/common.types';
 import { ValidatorError } from 'src/common/validator_error';
 import { TFromKey } from 'src/common/common.types';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class SignInRequest
 {
-  userName: string;
+  @ApiProperty()
+    userName: string;
   password: string;
 }
 
 
-class Success extends SuccessResponse
+class Success extends SuccessRespons
 {
   message: string;
   constructor(public userName: string)
@@ -20,7 +22,7 @@ class Success extends SuccessResponse
   
 }
 
-class ResponseError extends ErrorResponses
+class ResponseError extends ErrorResponse
 {
   constructor()
   {
@@ -28,7 +30,7 @@ class ResponseError extends ErrorResponses
   }
 }
 
-class NotFoundUser extends ErrorResponses
+class NotFoundUser extends ErrorResponse
 {
   constructor(public userName: string)
   {
@@ -58,18 +60,6 @@ export const SignInResponse =
 };
 
 
-// export type TSignInResponseError_needed = ResponseError | ValidatorsError | NotFoundUser
-
-// type TSignInResponse_keys = keyof typeof SignInResponse.Error
-// export type TSignInResponseError = typeof SignInResponse.Error[TSignInResponse_keys]
-
-
-// type _TSignInClasses = TFromKey<typeof SignInResponse.Success>
-// export type TSignInResponseSuccess = InstanceType<_TSignInClasses>
-
-// type _TSignInTypesError = TFromKey<typeof SignInResponse.Error>
-// export type TSignInResponseError = InstanceType<_TSignInTypesError>
-
 export namespace TSignIn
 {
   export namespace Response
@@ -78,11 +68,7 @@ export namespace TSignIn
     export type Error = InstanceType<TFromKey<typeof SignInResponse.Error>>
   }
 
-  export namespace Request
-  {
-
-  }
-  
+  export type Request = SignInRequest;
 }
 
 

@@ -1,21 +1,20 @@
-import { ErrorResponses, N_aryOperator, ResponseStatus } from 'src/common/common.types';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ErrorResponse, N_aryOperator, ResponseStatus } from 'src/common/common.types';
 import { ValidatorError } from 'src/common/validator_error';
-
-export class UserDtoAdd
-{
-  userName: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-}
 
 
 export class CreateRequest
 {
-  userName: string;
-  password: string;
-  firstName?: string;
-  lastName?: string;
+  @ApiProperty()
+    userName: string;
+  @ApiProperty()
+    password: string;
+  @ApiPropertyOptional()
+    firstName?: string;
+  @ApiPropertyOptional()
+    lastName?: string;
+
+
 }
 
 export class CreateResponseSuccess
@@ -40,7 +39,7 @@ export class CreateResponseFail
 }
 
 
-export class CreateResponseError extends ErrorResponses
+export class CreateResponseError extends ErrorResponse
 {
   constructor()
   {
@@ -48,7 +47,7 @@ export class CreateResponseError extends ErrorResponses
   }
 }
 
-export class CreateResponseErrorUserExist extends ErrorResponses
+export class CreateResponseErrorUserExist extends ErrorResponse
 {
   message: string;
   constructor()

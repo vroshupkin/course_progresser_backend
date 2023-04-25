@@ -4,7 +4,7 @@ import { validateDocument } from 'src/common/validators';
 import { User } from 'src/users/users.schema';
 import { UsersService } from 'src/users/users.service';
 import { SignInRequest, SignInResponse,  TSignIn } from './auth.dto';
-import { ErrorResponses, ResponseValidatorError } from 'src/common/common.types';
+import { ErrorResponse, ResponseValidatorError } from 'src/common/common.types';
 
 @Injectable()
 export class AuthService

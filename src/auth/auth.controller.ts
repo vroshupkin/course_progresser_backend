@@ -2,8 +2,10 @@ import { Body, Controller, HttpCode, HttpStatus, Post, Res } from '@nestjs/commo
 import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { SignInRequest } from './auth.dto';
-import { ErrorResponses } from 'src/common/common.types';
+import { ErrorResponse } from 'src/common/common.types';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController 
 {
@@ -15,11 +17,8 @@ export class AuthController
   async signIn(@Body() signInDto: SignInRequest, @Res() response: Response)
   {
     
-    // console.log(signInDto);
     const res = await this.authService.signIn(signInDto);
-    // console.log(res);
-    console.log(res);
-    if(res instanceof ErrorResponses)
+    if(res instanceof ErrorResponse)
     {
       response.status(HttpStatus.BAD_REQUEST).send(res);
       
@@ -27,17 +26,6 @@ export class AuthController
     }
     
     response.send(res);
-    
-    // console.log(res);
-    // if(Array.isArray(res))
-    // {
-    //   response.send(res);
-      
-    //   return;
-    // }
-
-    
-    // response.send('success');
     
     
   }

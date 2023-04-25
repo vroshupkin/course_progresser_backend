@@ -2,8 +2,9 @@ import { Body, Controller, Get, Param, Post, Query, Redirect, Req } from '@nestj
 import { CatsService } from './cats.service';
 import { Request } from 'express';
 import { CreateCatDto } from './dto';
+import { ApiTags } from '@nestjs/swagger';
 
-
+@ApiTags('cats')
 @Controller('cats')
 export class CatsController 
 {

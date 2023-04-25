@@ -6,17 +6,17 @@ export type TFromKey<T> = T[keyof T]
 
 export type ResponseStatus = 'success' | 'error'
 
-export abstract class SuccessResponse
+export abstract class SuccessRespons
 {
   status: ResponseStatus = 'success';
 }
 
-export abstract class ErrorResponses 
+export abstract class ErrorResponse 
 {
   status: ResponseStatus = 'error';
 }
 
-export abstract class ResponseValidatorError extends ErrorResponses
+export abstract class ResponseValidatorError extends ErrorResponse
 {
   constructor(public validators: ValidatorError[])
   {

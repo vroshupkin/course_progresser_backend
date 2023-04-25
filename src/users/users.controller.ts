@@ -1,9 +1,11 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Req, Res } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateResponseError, CreateResponseFail, CreateResponseSuccess, UserDtoAdd } from './user.dto';
+import { CreateRequest, CreateResponseError, CreateResponseFail, CreateResponseSuccess  } from './user.dto';
 import { Response } from 'express';
-import { ErrorResponses } from 'src/common/common.types';
+import { ErrorResponse } from 'src/common/common.types';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('users')
 @Controller('users')
 export class UsersController
 {
@@ -34,11 +36,11 @@ export class UsersController
 
   @Post()
   @HttpCode(201)
-  async createUser(@Body() userDtoAdd: UserDtoAdd, @Res() response: Response)
+  async createUser(@Body() userDtoAdd: CreateRequest, @Res() response: Response)
   {
     const res = await this.usersService.Create(userDtoAdd);
 
-    if(res instanceof CreateResponseFail ||  res instanceof ErrorResponses)
+    if(res instanceof CreateResponseFail ||  res instanceof ErrorResponse)
     {
       response.status(HttpStatus.BAD_REQUEST).send(res);   
       

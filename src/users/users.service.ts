@@ -2,7 +2,7 @@ import { Model, Document } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './users.schema';
-import { CreateRequest, CreateResponseError, CreateResponseErrorUserExist, CreateResponseFail, CreateResponseSuccess, UserDtoAdd } from './user.dto';
+import { CreateRequest, CreateResponseError, CreateResponseErrorUserExist, CreateResponseFail, CreateResponseSuccess } from './user.dto';
 import { InEqValidator, validateDocument } from 'src/common/validators';
 import { Error } from 'mongoose';
 import { GreaterThanValidator, LessThanValidator } from 'src/common/validator_error';
