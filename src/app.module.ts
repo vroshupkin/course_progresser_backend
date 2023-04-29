@@ -5,7 +5,6 @@ import { CatsService } from './cats/cats.service';
 import { CatsController } from './cats/cats.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
-import { UsersHttpModule } from './users/users-http.module';
 import { UsersController } from './users/users.controller';
 import { CatsModule } from './cats/cats.module';
 import { MongooseModule } from '@nestjs/mongoose'; 

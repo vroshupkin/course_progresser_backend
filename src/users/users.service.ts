@@ -1,5 +1,5 @@
 import { Model, Document } from 'mongoose';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './users.schema';
 import { CreateRequest, CreateResponseError, CreateResponseErrorUserExist, CreateResponseFail, CreateResponseSuccess } from './user.dto';
@@ -24,40 +24,35 @@ export class UsersService
     
     if(await this.FindOne(request.userName) != null)
     {
-   
       return new CreateResponseErrorUserExist();
     }
 
-
     const createUser = new this.userModel(request);
-
     const schemaValidate = await validateDocument(createUser);
-    if(schemaValidate.length > 0)
+    const isSchemaValidate = schemaValidate.length == 0;
+
+    if(!isSchemaValidate)
     {
-      return schemaValidate;
+      return isSchemaValidate;
     }
 
-    const pass_len = createUser.password.length;
-    const validator_res = 
-    [       
-      GreaterThanValidator(pass_len, 6)('Пароль должен быть больше 6 символов'),
-      LessThanValidator(pass_len, 32)('Пароль должен быть меньше 32 символов'),
-    ]
-      .filter(v => v != null);
-
-    
-    if(validator_res.length > 0)
+    if(createUser.password.length < 6 || createUser.password.length > 32)
     {
-      return new CreateResponseFail(validator_res);
+      throw new BadRequestException('Пароль должен быть больше 6 символов и меньше 32');
     }
     
     createUser.save();
-    if(await this.FindOne(createUser.userName) != null)
+    const findUser = await this.FindOne(createUser.userName);
+
+    
+    if(findUser == null)
     {
-      return new CreateResponseSuccess();      
+      return new CreateResponseError();    
     }
     
-    return new CreateResponseError();    
+    return new CreateResponseSuccess();      
+    
+    
   }
 
   async FindAll() 
