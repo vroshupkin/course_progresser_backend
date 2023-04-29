@@ -16,11 +16,17 @@ export class CreateRequest
 
 }
 
+export class UpdateUserDto
+{
+  @ApiProperty({ description: 'Имя пользователя' })
+    userName: string;
+  @ApiPropertyOptional({ description: 'Имя' })
+    firstName?: string;
+  @ApiPropertyOptional({ description: 'Фамилия' })
+    lastName?: string;
 
-// export class RefreshDto
-// {
-//   @ApiProperty 
-// }
+}
+
 
 export class CreateResponseSuccess
 { 

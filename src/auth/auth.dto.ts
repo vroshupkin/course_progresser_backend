@@ -1,7 +1,7 @@
 import { ErrorResponse, ResponseStatus, ResponseValidatorError, SuccessRespons as SuccessResponse } from 'src/common/common.types';
 import { ValidatorError } from 'src/common/validator_error';
 import { TFromKey } from 'src/common/common.types';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class SignInRequest
 {
@@ -12,6 +12,7 @@ export class SignInRequest
 }
 
 
+// TODO Избавиться от логики success 
 class Success extends SuccessResponse
 {
   message: string;
@@ -73,4 +74,12 @@ export namespace TSignIn
   export type Request = SignInRequest;
 }
 
+
+export class RefreshTokenDto
+{
+  @ApiProperty({ description: 'Имя пользователя' })
+    userName: string;
+  @ApiProperty({ description: 'Обновление токена' })
+    refreshToken: string;
+}
 

@@ -1,11 +1,14 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Catch, Controller, HttpCode, HttpStatus, Post, Res, SetMetadata, UseFilters, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
-import { SignInRequest } from './auth.dto';
+import { RefreshTokenDto, SignInRequest } from './auth.dto';
 import { ErrorResponse } from 'src/common/common.types';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtService } from '@nestjs/jwt';
+import { BadRequestFilter } from './auth.filter';
+import { IS_PUBLIC_KEY } from './constants';
+import { Public } from './auth.decorators';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -16,9 +19,12 @@ export class AuthController
 
   constructor(private authService: AuthService){}
 
-  @Post()
+  @Post('signIn')
+  @Public()
   @HttpCode(201)
-  // @UseGuards(AuthGuard(''))
+  
+
+  @ApiOperation({ summary: 'Вход в приложение и получение jwt токена' })
   async signIn(@Body() signInDto: SignInRequest, @Res() response: Response)
   {
     
@@ -30,12 +36,26 @@ export class AuthController
       
       return;
     }
-    
-    
+        
     response.send(res);
-    
-    
   }
   
   
+  @Post('refreshToken')
+  @Public()
+  @HttpCode(201)
+  @UseFilters(new BadRequestFilter())
+
+  @ApiOperation({ summary: 'Обновляет jwt токен' })
+  @ApiResponse({ status: HttpStatus.OK })
+  async refreshToken(@Body() dto: RefreshTokenDto, @Res() response: Response)
+  {
+    
+    const res = await this.authService.refresh(dto);
+    response.send(res);
+  }
+
+
 }
+
+
