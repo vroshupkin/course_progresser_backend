@@ -27,11 +27,16 @@ const greater_than = (a: number, b: number) => a > b;
 const less_than = (a: number, b: number) => a < b;
 const IsNotUndefiend = (a: any) => a != undefined;
 const IsNotNull = ((a: any) => a != null);
+const IsEqual = ((a: any, b: any) => a == b);
+const IsNotEqual = ((a: any, b: any) => a != b);
 
 export const Validators = 
 {
   IsNotNull: ErrorValidatorFactory(IsNotNull),
   IsNotUndefiend: ErrorValidatorFactory(IsNotUndefiend),
+  IsEqual: ErrorValidatorFactory(IsEqual),
+  IsNotEqual: ErrorValidatorFactory(IsNotEqual),
+  
 };
 
 

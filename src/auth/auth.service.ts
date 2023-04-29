@@ -1,41 +1,49 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ExistInObjValidator,  ValidatorError, Validators } from 'src/common/validator_error';
 import { validateDocument } from 'src/common/validators';
 import { User } from 'src/users/users.schema';
 import { UsersService } from 'src/users/users.service';
 import { SignInRequest, SignInResponse,  TSignIn } from './auth.dto';
 import { ErrorResponse, ResponseValidatorError } from 'src/common/common.types';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService
 {
-  constructor(private userService: UsersService) 
+  constructor(
+    private userService: UsersService,
+    private jwtService: JwtService
+  ) 
   {}
 
-  async signIn(dto: SignInRequest): Promise<TSignIn.Response.Success | TSignIn.Response.Error> 
+  async signIn(dto: SignInRequest)
   {
-  
-    const is_not_undefiend_validators = 
-    [
-      Validators.IsNotUndefiend(dto.userName)('userName не должен быть равен undefiend'),
-      Validators.IsNotUndefiend(dto.password)('password должен существовать')
-    ].filter(v => v != null);
+    
+    const is_not_undefiend_validators = {
+      password: dto.password ?? 'Пароль должен быть передан' ,
+      userName: dto.userName ?? 'Имя пользователя должно быть передано'
+    };
 
-    if(is_not_undefiend_validators.length > 0)
+    if(Object.entries(is_not_undefiend_validators).filter(v => v == undefined).length > 0)
     {
-      return new SignInResponse.Error.ValidatorsError(is_not_undefiend_validators);
+      throw new BadRequestException(is_not_undefiend_validators);
     }
 
-    const user = await this.userService.FindOne(dto.userName);
-    
-    const user_not_validators = 
-    [
-      Validators.IsNotNull(user)(`Пользователь с именем ${dto.userName} не найден`)
-    ].filter(v => v != null);
 
-    return user_not_validators.length > 0? 
-      new SignInResponse.Error.ValidatorsError(user_not_validators):
-      new SignInResponse.Success.Success(user.userName);
+    const user = await this.userService.FindOne(dto.userName);
+    if(user == null || user.password != dto.password)
+    {
+      throw new BadRequestException({ message: 'Неверно задан логин/пароль' });
+    }
+    
+    
+    const payload = { userName: user.userName, sub: user._id };
+    const token = 
+    {
+      access_token: await this.jwtService.signAsync(payload)
+    };
+
+    return new SignInResponse.Success.Success(token);
 
     
   }

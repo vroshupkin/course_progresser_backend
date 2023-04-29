@@ -1,4 +1,4 @@
-import { ErrorResponse, ResponseStatus, ResponseValidatorError, SuccessRespons } from 'src/common/common.types';
+import { ErrorResponse, ResponseStatus, ResponseValidatorError, SuccessRespons as SuccessResponse } from 'src/common/common.types';
 import { ValidatorError } from 'src/common/validator_error';
 import { TFromKey } from 'src/common/common.types';
 import { ApiProperty } from '@nestjs/swagger';
@@ -7,14 +7,15 @@ export class SignInRequest
 {
   @ApiProperty()
     userName: string;
-  password: string;
+  @ApiProperty()
+    password: string;
 }
 
 
-class Success extends SuccessRespons
+class Success extends SuccessResponse
 {
   message: string;
-  constructor(public userName: string)
+  constructor(public user: any)
   {
     super();
     this.message = 'Вход в систему';
@@ -51,6 +52,7 @@ export const SignInResponse =
   Success: {
     Success: Success,
   },
+
 
   Error: {
     Error: ResponseError,

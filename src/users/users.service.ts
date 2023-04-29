@@ -24,8 +24,7 @@ export class UsersService
     
     if(await this.FindOne(request.userName) != null)
     {
-      console.log('user exist');
-      
+   
       return new CreateResponseErrorUserExist();
     }
 
@@ -69,7 +68,9 @@ export class UsersService
 
   async FindOne(userName: string) 
   {
-    return this.userModel.findOne({ userName }).exec();
+    const res = this.userModel.findOne({ userName: userName });
+    
+    return  res;
   }
 
   
