@@ -13,13 +13,19 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthGuard } from './auth/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
+import { TimersController } from './timers/timers.controller';
+import { TimersService } from './timers/timers.service';
+import { TimersModule } from './timers/timers.module';
 
 
 @Module({
   imports: [
     MongooseModule.forRoot('mongodb://localhost/progresser'),
-    ConfigModule.forRoot()
+    ConfigModule.forRoot(),
+    TimersModule
   ],
+  controllers: [TimersController],
+  providers: [TimersService],
   
 })
 export class DatabaseModule

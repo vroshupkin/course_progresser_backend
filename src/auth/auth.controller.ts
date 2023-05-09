@@ -1,4 +1,4 @@
-import { Body, Catch, Controller, HttpCode, HttpStatus, Post, Res, SetMetadata, UseFilters, UseGuards } from '@nestjs/common';
+import { Body, Catch, Controller, HttpCode, HttpStatus, Post, Req, Res, SetMetadata, UseFilters, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { RefreshTokenDto, SignInRequest } from './auth.dto';
@@ -9,6 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { BadRequestFilter } from './auth.filter';
 import { IS_PUBLIC_KEY } from './constants';
 import { Public } from './auth.decorators';
+import { Request } from 'express';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -22,20 +23,22 @@ export class AuthController
   @Post('signIn')
   @Public()
   @HttpCode(201)
-  
+  @UseFilters(new BadRequestFilter())
 
   @ApiOperation({ summary: 'Вход в приложение и получение jwt токена' })
-  async signIn(@Body() signInDto: SignInRequest, @Res() response: Response)
+  async signIn(@Body() signInDto: SignInRequest, @Res() response: Response, @Req() request: Request)
   {
-    
+    // console.log(signInDto);
+
+    console.log(request);
     const res = await this.authService.signIn(signInDto);
 
-    if(res instanceof ErrorResponse)
-    {
-      response.status(HttpStatus.BAD_REQUEST).send(res);
+    // if(res instanceof ErrorResponse)
+    // {
+    //   response.status(HttpStatus.BAD_REQUEST).send(res);
       
-      return;
-    }
+    //   return;
+    // }
         
     response.send(res);
   }

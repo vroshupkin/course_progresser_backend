@@ -9,7 +9,7 @@ export class BadRequestFilter implements ExceptionFilter
   {    
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    
+
     response
       .status(HttpStatus.BAD_REQUEST)
       .json(
