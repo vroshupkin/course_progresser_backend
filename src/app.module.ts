@@ -10,22 +10,27 @@ import { CatsModule } from './cats/cats.module';
 import { MongooseModule } from '@nestjs/mongoose'; 
 import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthGuard } from './auth/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { TimersController } from './timers/timers.controller';
 import { TimersService } from './timers/timers.service';
 import { TimersModule } from './timers/timers.module';
+import { TelegrafModule } from 'nestjs-telegraf';
+import { NotifyUpdate } from './notify/notify.update';
+import * as LocalSession from 'telegraf-session-local';
+import { NotifyModule } from './notify/notify.module';
 
 
+const sessions = new LocalSession({ database: 'session_db.json' });
 @Module({
   imports: [
     MongooseModule.forRoot('mongodb://localhost/progresser'),
     ConfigModule.forRoot(),
     TimersModule
   ],
-  controllers: [TimersController],
-  providers: [TimersService],
+  controllers: [ TimersController ],
+  providers: [ TimersService ],
   
 })
 export class DatabaseModule
@@ -33,8 +38,22 @@ export class DatabaseModule
 
 
 @Module({
-  imports: [ CatsModule, DatabaseModule, UsersModule, AuthModule ],
-  providers: [ { provide: APP_GUARD, useClass: AuthGuard } ] 
+  imports: [ 
+    CatsModule,
+    DatabaseModule,
+    UsersModule,
+    AuthModule , 
+    TelegrafModule.forRoot({
+      middlewares: [ sessions.middleware() ],
+      token: new ConfigService().get('TELEGRAM_TOKEN')
+    }),
+    NotifyModule
+
+  ],
+  providers: [
+    // Global guard!
+    { provide: APP_GUARD, useClass: AuthGuard },
+  ] 
 })
 export class AppModule 
 {}
