@@ -20,11 +20,10 @@ export class User
       refreshToken: string;
   
     _id: mongoose.Types.ObjectId;
-
     
+
 }
 
-
-export type UserDocument = HydratedDocument<User>;
+// export type UserDocument = HydratedDocument<User>;
 export const UserSchema = SchemaFactory.createForClass(User);
 

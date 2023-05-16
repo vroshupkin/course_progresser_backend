@@ -6,6 +6,7 @@ import { ErrorResponse } from 'src/common/common.types';
 import { ApiOperation, ApiParam, ApiProperty, ApiQuery, ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { curry } from 'ramda';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { Public } from 'src/auth/auth.decorators';
 
 
 @ApiTags('users')
@@ -47,20 +48,14 @@ export class UsersController
 
   @Post('register')
   @HttpCode(201)
+  @Public()
 
   @ApiOperation({ summary: 'Регистрирует нового пользователя' })
-  async createUser(@Body() userDtoAdd: CreateRequest, @Res() response: Response)
+  async createUser(@Body() userDtoAdd: CreateRequest)
   {
-    const res = await this.usersService.Create(userDtoAdd);
-
-    if(res instanceof ErrorResponse)
-    {
-      response.status(HttpStatus.BAD_REQUEST).send(res);   
-      
-      return; 
-    }
+    await this.usersService.Create(userDtoAdd); 
     
-    response.send(res);
+    return 'ok';
   }
 
 }

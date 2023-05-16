@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ExistInObjValidator,  ValidatorError, Validators } from 'src/common/validator_error';
 import { validateDocument } from 'src/common/validators';
-import { User } from 'src/users/users.schema';
+import { UserSchema } from 'src/users/users.schema';
 import { UsersService } from 'src/users/users.service';
 import { RefreshTokenDto, SignInRequest, SignInResponse,  TSignIn } from './auth.dto';
 import { ErrorResponse, ResponseValidatorError } from 'src/common/common.types';

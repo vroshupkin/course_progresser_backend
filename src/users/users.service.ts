@@ -1,4 +1,4 @@
-import { Model, Document } from 'mongoose';
+import mongoose, { Model, Document } from 'mongoose';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './users.schema';
@@ -16,24 +16,23 @@ export class UsersService
     private userModel: Model<User>
   )
   {
-    
+      
   }
 
   async Create(request: CreateRequest) 
   {
-    
-    if(await this.FindOne(request.userName) != null)
+    const isUserFind = await this.FindOne(request.userName) != null;
+
+    if(isUserFind)
     {
-      return new CreateResponseErrorUserExist();
+      throw new BadRequestException('Пользователь найден');
     }
 
     const createUser = new this.userModel(request);
     const schemaValidate = await validateDocument(createUser);
-    const isSchemaValidate = schemaValidate.length == 0;
-
-    if(!isSchemaValidate)
+    if(schemaValidate.length > 0)
     {
-      return isSchemaValidate;
+      throw new BadRequestException(schemaValidate);
     }
 
     if(createUser.password.length < 6 || createUser.password.length > 32)
@@ -41,17 +40,9 @@ export class UsersService
       throw new BadRequestException('Пароль должен быть больше 6 символов и меньше 32');
     }
     
-    createUser.save();
-    const findUser = await this.FindOne(createUser.userName);
-
+    await createUser.save();
     
-    if(findUser == null)
-    {
-      return new CreateResponseError();    
-    }
-    
-    return new CreateResponseSuccess();      
-    
+    return;
     
   }
 

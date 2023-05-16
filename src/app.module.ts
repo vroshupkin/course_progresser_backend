@@ -20,6 +20,7 @@ import { TelegrafModule } from 'nestjs-telegraf';
 import { NotifyUpdate } from './notify/notify.update';
 import * as LocalSession from 'telegraf-session-local';
 import { NotifyModule } from './notify/notify.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 
 const sessions = new LocalSession({ database: 'session_db.json' });
@@ -47,8 +48,8 @@ export class DatabaseModule
       middlewares: [ sessions.middleware() ],
       token: new ConfigService().get('TELEGRAM_TOKEN')
     }),
-    NotifyModule
-
+    NotifyModule,
+    ScheduleModule.forRoot()
   ],
   providers: [
     // Global guard!
