@@ -5,7 +5,7 @@ import { User } from 'src/users/users.schema';
 @Schema()
 export class ChatId
 {
-    @Prop({ type: mongoose.Schema.Types.ObjectId, unique: true, ref: User.name })
+    @Prop({ type: mongoose.Schema.Types.ObjectId, unique: true, ref: 'users' })
       user: mongoose.Types.ObjectId;
       
     @Prop()

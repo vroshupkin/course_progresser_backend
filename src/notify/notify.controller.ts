@@ -2,7 +2,7 @@ import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
 import { Public } from 'src/auth/auth.decorators';
 import { NotifyService } from './notify.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { NotifyReqDto } from './notify.dto';
+import { NotifyRegisterDto, NotifyReqDto } from './notify.dto';
 
 
 @Controller('notify')
@@ -29,11 +29,11 @@ export class NotifyController
   @Public()
   @HttpCode(201)
 
-  // @ApiOperation({ summary: 'Отправляет в телеграмм бот сообщение пользователю chat_id' })
-  async Register(@Body() body: {chatId: string, userName: string})
+  @ApiOperation({ summary: 'Регистрирует пользователя по chat_id в приложении' })
+  async Register(@Body() body: NotifyRegisterDto)
   {
     const log = 'service';
-    const out = await this.notify_service.RegisterChatId(body.userName, body.chatId);
+    const out = await this.notify_service.RegisterChatId(body.userName, body.chat_id);
 
     return {
       service: log,

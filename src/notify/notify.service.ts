@@ -60,11 +60,20 @@ export class NotifyService
       console.log(find_chatId);
     }
 
-    const createChatId = new this.chatIdModel({ chatId: chatId, user: user.id });
+    const findedUser = await this.chatIdModel.findOne({ user: user.id });
+
+    if(findedUser == null)
+    {
+      const createChatId = new this.chatIdModel({ chatId: chatId, user: user.id });
+      await createChatId.save();
+    }
+    else
+    {
+      findedUser.chat_id = chatId;
+      await findedUser.save();
+      
+    }
     
-    createChatId.save();
-    // const res = this.chatIdModel.updateOne({ user_model: user, chat_id: chatId });
-    // console.log(res);
     
     return;
   }
