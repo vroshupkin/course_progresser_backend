@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ExistInObjValidator,  ValidatorError, Validators } from 'src/common/validator_error';
 import { validateDocument } from 'src/common/validators';
-import { UserSchema } from 'src/users/users.schema';
+import { User } from 'src/users/users.schema';
 import { UsersService } from 'src/users/users.service';
 import { RefreshTokenDto, SignInRequest, SignInResponse,  TSignIn } from './auth.dto';
 import { ErrorResponse, ResponseValidatorError } from 'src/common/common.types';
@@ -32,6 +32,8 @@ export class AuthService
     }
     
     const user = await this.userService.FindOne(dto.userName);
+
+
     if(user == null)
     {
       throw new BadRequestError({ login_error: 'Неверно задан логин' });
@@ -47,9 +49,11 @@ export class AuthService
     
     const token = 
     {
-      access_token: await this.jwtService.signAsync(payload)
+      access_token: await this.jwtService.signAsync(payload),
+      
     };
 
+    // TODO Попробовать без сохраненич а бд рефреш токена 
     user.refreshToken = token.access_token;
     user.save();
     

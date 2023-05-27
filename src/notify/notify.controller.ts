@@ -1,7 +1,7 @@
 import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
 import { Public } from 'src/auth/auth.decorators';
 import { NotifyService } from './notify.service';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { NotifyRegisterDto, NotifyReqDto } from './notify.dto';
 
 
@@ -19,6 +19,7 @@ export class NotifyController
   @Public()
   @HttpCode(201)
 
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Отправляет в телеграмм бот сообщение пользователю chat_id' })
   sendMessage(@Body() body: NotifyReqDto)
   {

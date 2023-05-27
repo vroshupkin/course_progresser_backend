@@ -10,8 +10,7 @@ import { CatsModule } from './cats/cats.module';
 import { MongooseModule } from '@nestjs/mongoose'; 
 import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AuthGuard } from './auth/auth.guard';
+import { AdminGuard, AuthGuard } from './auth/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { TimersController } from './timers/timers.controller';
 import { TimersService } from './timers/timers.service';
@@ -21,13 +20,13 @@ import { NotifyUpdate } from './notify/notify.update';
 import * as LocalSession from 'telegraf-session-local';
 import { NotifyModule } from './notify/notify.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { config } from './config';
 
 
 const sessions = new LocalSession({ database: 'session_db.json' });
 @Module({
   imports: [
     MongooseModule.forRoot('mongodb://localhost/progresser'),
-    ConfigModule.forRoot(),
     TimersModule
   ],
   controllers: [ TimersController ],
@@ -46,14 +45,16 @@ export class DatabaseModule
     AuthModule , 
     TelegrafModule.forRoot({
       middlewares: [ sessions.middleware() ],
-      token: new ConfigService().get('TELEGRAM_TOKEN')
+      token: config.TELEGRAM_TOKEN
     }),
     NotifyModule,
-    ScheduleModule.forRoot()
+    ScheduleModule.forRoot(),
+    // ConfigModule.forRoot({ isGlobal: true })
   ],
   providers: [
     // Global guard!
     { provide: APP_GUARD, useClass: AuthGuard },
+    AdminGuard
   ] 
 })
 export class AppModule 

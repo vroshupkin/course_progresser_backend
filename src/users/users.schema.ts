@@ -1,6 +1,8 @@
 import { Prop, Schema, SchemaFactory, raw } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 
+type TRole = 'user' | 'admin'
+
 @Schema()
 export class User
 {
@@ -18,7 +20,10 @@ export class User
 
     @Prop()
       refreshToken: string;
-  
+
+    @Prop()
+      role: TRole;
+
     _id: mongoose.Types.ObjectId;
     
 

@@ -1,24 +1,24 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateRequest, CreateResponseError, CreateResponseFail, CreateResponseSuccess, ResponseGetUser  } from './user.dto';
+import { CreateDto, CreateResponseError, CreateResponseFail, CreateResponseSuccess, DeleteDto, GetUserDto  } from './user.dto';
 import { Response } from 'express';
 import { ErrorResponse } from 'src/common/common.types';
-import { ApiOperation, ApiParam, ApiProperty, ApiQuery, ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiProperty, ApiQuery, ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { curry } from 'ramda';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AdminGuard } from 'src/auth/auth.guard';
 import { Public } from 'src/auth/auth.decorators';
 
 
 @ApiTags('users')
 @Controller('users')
-@ApiSecurity('X-API-KEY', [ 'X-API-KEY' ]) // <----- Авторизация через Swagger
+
 export class UsersController
 {
   constructor(private usersService: UsersService)
   {}
 
   @Get('all')
-  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   async getUsers()
   { 
 
@@ -27,16 +27,15 @@ export class UsersController
 
 
   @Get(':userName')
-  @UseGuards(AuthGuard)
-  // Swagger doc
-  @ApiOperation({ summary: 'Возвращает данные пользователя' })
-  @ApiResponse({ status: HttpStatus.OK, type: ResponseGetUser })
-  @ApiParam({ name: 'userName', required: true, description: 'Имя пользователя' })
   
+  @ApiOperation({ summary: 'Возвращает данные пользователя' })
+  @ApiResponse({ status: HttpStatus.OK, type: GetUserDto })
+  @ApiParam({ name: 'userName', required: true, description: 'Имя пользователя' })
+  @ApiBearerAuth()
   async getUser(@Param('userName') params: {userName: string})
   {
     const user = await this.usersService.FindOne(params.userName);
-
+    
     if(user == null)
     {
       return `Пользователя с именем = ${params.userName} не найдено`;
@@ -51,11 +50,31 @@ export class UsersController
   @Public()
 
   @ApiOperation({ summary: 'Регистрирует нового пользователя' })
-  async createUser(@Body() userDtoAdd: CreateRequest)
+  async createUser(@Body() userDtoAdd: CreateDto)
   {
     await this.usersService.Create(userDtoAdd); 
     
     return 'ok';
   }
 
+  
+  @Delete('delete')
+  @HttpCode(200)
+  @Public()
+  @UseGuards(AdminGuard)
+  @ApiBearerAuth()
+
+  @ApiOperation({ summary: 'Удаляет пользователя' })
+  async delete(@Body() deleteDto: DeleteDto)
+  { 
+    const res = await this.usersService.Delete(deleteDto.userName);
+
+    if(res.deletedCount === 0)
+    {
+      return `Пользователь с именем "${deleteDto.userName}" не найден`;  
+    }
+    
+    return 'ok';
+  }
+  
 }

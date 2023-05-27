@@ -5,7 +5,7 @@ import { Model } from 'mongoose';
 import { InjectBot } from 'nestjs-telegraf';
 import { User } from 'src/users/users.schema';
 import { Context, Telegraf }from 'telegraf';
-import { ChatId } from './notify.schema.chat_id';
+import { ChatId } from './notify.schema';
 
 @Injectable()
 export class NotifyService
@@ -47,9 +47,9 @@ export class NotifyService
       throw new NotFoundException();
     }
     
-    console.log(user.userName);
-    console.log(user.password);
-    console.log(user.id);
+    // console.log(user.userName);
+    // console.log(user.password);
+    // console.log(user.id);
     // const createChatId = new this.chatIdModel({ chatId: chatId, user: { userName: userName, password: user.password } });
 
     const find_chatId = await this.userModel.findOne({ _id: user.id });

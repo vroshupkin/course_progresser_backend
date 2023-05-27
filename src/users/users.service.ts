@@ -2,10 +2,8 @@ import mongoose, { Model, Document } from 'mongoose';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './users.schema';
-import { CreateRequest, CreateResponseError, CreateResponseErrorUserExist, CreateResponseFail, CreateResponseSuccess, UpdateUserDto } from './user.dto';
-import { InEqValidator, validateDocument } from 'src/common/validators';
-import { Error } from 'mongoose';
-import { GreaterThanValidator, LessThanValidator } from 'src/common/validator_error';
+import { CreateDto,  UpdateUserDto } from './user.dto';
+import { validateDocument } from 'src/common/validators';
 
 
 @Injectable()
@@ -19,16 +17,19 @@ export class UsersService
       
   }
 
-  async Create(request: CreateRequest) 
+  async Create(request: CreateDto) 
   {
     const isUserFind = await this.FindOne(request.userName) != null;
 
     if(isUserFind)
     {
-      throw new BadRequestException('Пользователь найден');
+      throw new BadRequestException('Пользователь с таким именем уже существует');
     }
 
+
     const createUser = new this.userModel(request);
+    createUser.role = 'user';
+    
     const schemaValidate = await validateDocument(createUser);
     if(schemaValidate.length > 0)
     {
@@ -56,6 +57,8 @@ export class UsersService
   {
     const res = this.userModel.findOne({ userName: userName });
     
+    console.log(userName);
+    
     return  res;
   }
 
@@ -65,6 +68,26 @@ export class UsersService
     
     return res;
   }
+
+  async Delete(userName: string)
+  {
+    const res = this.userModel.deleteOne({ userName });
+    
+    return res;
+  }
+
+  async GetRole(userName: string)
+  {
+    const res = await this.userModel.findOne({ userName });
+
+    if(res == null)
+    {
+      return null;
+    }
+    
+    return res.role;
+  }
+  
   
 }
 

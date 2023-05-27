@@ -3,16 +3,17 @@ import { ErrorResponse, N_aryOperator, ResponseStatus } from 'src/common/common.
 import { ValidatorError } from 'src/common/validator_error';
 
 
-export class CreateRequest
+export class CreateDto
 {
-  @ApiProperty({ description: 'Имя пользователя' })
+  @ApiProperty({ example: 'user_1' })
     userName: string;
-  @ApiProperty({ description: 'Пароль' })
+  @ApiProperty({ example: 'user_password' })
     password: string;
-  @ApiPropertyOptional({ description: 'Имя' })
+  @ApiPropertyOptional({ example: 'Richard' })
     firstName?: string;
-  @ApiPropertyOptional({ description: 'Фамилия' })
+  @ApiPropertyOptional({ example: 'Smith' })
     lastName?: string;
+  
 
 }
 
@@ -72,7 +73,7 @@ export class CreateResponseErrorUserExist extends ErrorResponse
 }
 
 
-export class ResponseGetUser
+export class GetUserDto
 { 
   @ApiProperty({ description: 'Имя пользователя' })
     userName: string;  
@@ -80,4 +81,10 @@ export class ResponseGetUser
     firstName: string;
   @ApiProperty({ description: 'Фамилия' })
     lastName: string;
+}
+
+export class DeleteDto
+{
+  @ApiProperty({ description: 'Имя пользователя' })
+    userName: string;  
 }

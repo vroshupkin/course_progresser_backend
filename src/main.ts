@@ -12,12 +12,7 @@ async function bootstrap()
     .setDescription('Core module for web app')
     .setVersion('0.1')
     .addTag('For you, for me, for world')
-    .addApiKey({       // <--- Покажет опцию X-API-KEY (apiKey)
-      type: 'apiKey',  // в окне 'Available authorizations' в Swagger
-      name: 'X-API-KEY', 
-      in: 'header', 
-      description: 'Enter your API key' 
-    }, 'X-API-KEY')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
