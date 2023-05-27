@@ -5,9 +5,9 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class SignInRequest
 {
-  @ApiProperty()
+  @ApiProperty({ example: 'admin' })
     userName: string;
-  @ApiProperty()
+  @ApiProperty({ example: 'admin admin' })
     password: string;
 }
 

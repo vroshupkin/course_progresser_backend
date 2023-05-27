@@ -28,18 +28,8 @@ export class AuthController
   @ApiOperation({ summary: 'Вход в приложение и получение jwt токена' })
   async signIn(@Body() signInDto: SignInRequest, @Res() response: Response, @Req() request: Request)
   {
-    // console.log(signInDto);
-
-    console.log(request);
     const res = await this.authService.signIn(signInDto);
-
-    // if(res instanceof ErrorResponse)
-    // {
-    //   response.status(HttpStatus.BAD_REQUEST).send(res);
-      
-    //   return;
-    // }
-        
+     
     response.send(res);
   }
   
