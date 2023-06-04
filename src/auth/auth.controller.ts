@@ -22,12 +22,33 @@ export class AuthController
 
   @Post('signIn')
   @Public()
-  @HttpCode(201)
+  @HttpCode(200)
   @UseFilters(new BadRequestFilter())
 
   @ApiOperation({ summary: 'Вход в приложение и получение jwt токена' })
   async signIn(@Body() signInDto: SignInRequest, @Res() response: Response, @Req() request: Request)
   {
+    const errors = {
+      userName: null as null | string,
+      password: null as null | string
+    };
+
+    if(typeof(signInDto.userName) != 'string')
+    {
+      errors.userName = 'Имя пользователя должно быть передано';
+    }
+    if(typeof(signInDto.password) != 'string')
+    {
+      errors.password = 'Пароль должен быть передан';
+    }
+
+    if(errors.userName != null || errors.password != null)
+    {
+      response.send(errors);  
+      
+      return;
+    }
+    
     const res = await this.authService.signIn(signInDto);
      
     response.send(res);
