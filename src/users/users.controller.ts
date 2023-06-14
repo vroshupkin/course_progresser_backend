@@ -1,20 +1,25 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors, Scope, Inject, Query, Header } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateDto, CreateResponseError, CreateResponseFail, CreateResponseSuccess, DeleteDto, GetUserDto  } from './user.dto';
-import { Response } from 'express';
+import { Response, query, request } from 'express';
 import { ErrorResponse } from 'src/common/common.types';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiProperty, ApiQuery, ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { curry } from 'ramda';
 import { AdminGuard } from 'src/auth/auth.guard';
 import { Public } from 'src/auth/auth.decorators';
-
+import { FileInterceptor, MulterModule } from '@nestjs/platform-express';
+import * as multer from 'multer';
+import { REQUEST } from '@nestjs/core';
+import * as fs from 'fs';
+import { join } from 'path';
 
 @ApiTags('users')
 @Controller('users')
 
+
 export class UsersController
 {
-  constructor(private usersService: UsersService)
+  constructor(@Inject(REQUEST) private request, private usersService: UsersService)
   {}
 
   @Get('all')
@@ -26,19 +31,19 @@ export class UsersController
   }
 
 
-  @Get(':userName')
+  @Get('getUser')
   
   @ApiOperation({ summary: 'Возвращает данные пользователя' })
   @ApiResponse({ status: HttpStatus.OK, type: GetUserDto })
   @ApiParam({ name: 'userName', required: true, description: 'Имя пользователя' })
   @ApiBearerAuth()
-  async getUser(@Param('userName') params: {userName: string})
+  async getUser(@Param('userName') param: {userName: string})
   {
-    const user = await this.usersService.FindOne(params.userName);
+    const user = await this.usersService.FindOne(param.userName);
     
     if(user == null)
     {
-      return `Пользователя с именем = ${params.userName} не найдено`;
+      return `Пользователя с именем = ${param.userName} не найдено`;
     }
      
     return user;
@@ -76,5 +81,47 @@ export class UsersController
     
     return 'ok';
   }
+
+  @Post('upload-avatar')
+
+  @UseInterceptors(FileInterceptor('file'))
+
+  @HttpCode(202)
+  @ApiBearerAuth()
+
+  @ApiOperation({ summary: 'Загружает аватар пользователя' })
+  async uploadAvatar(@Body() body: {userName: string}, @UploadedFile() file: Express.Multer.File)
+  {
+    const error = this.usersService.UploadAvatar(file, body.userName);
+
+    if(error instanceof Error)
+    {
+      return error;
+    }
+    
+    return 'ok';
+  }
+
+
+  @Get('get-avatar/:userName')
+
+  @HttpCode(200)
+  @ApiBearerAuth()
+
+  @ApiOperation({ summary: 'Получает аватар пользователя' })
+  @Header('Content-Type', 'image/jpg')
+  async getAvatar(@Param() param: {userName: string}, @Res() res: Response) 
+  {
+
+    res.set('Content-Type', 'image/jpg');
+    
+    const filePath = join(process.cwd(), `/uploads/${param.userName}.jpg`);
+
+    const file = fs.createReadStream(filePath);
+    file.pipe(res);
+        
+    return 'ok';
+  }
+  
   
 }

@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from './users.schema';
 import { CreateDto,  UpdateUserDto } from './user.dto';
 import { validateDocument } from 'src/common/validators';
-
+import * as fs from 'fs';
 
 @Injectable()
 export class UsersService
@@ -88,6 +88,31 @@ export class UsersService
     return res.role;
   }
   
+  async UploadAvatar(file: Express.Multer.File, userName: string)
+  {
+    if(file)
+    {
+      const file_extension = file.originalname.split('.')[1];
+      const fileName = `${userName}.${file_extension}`;
+
+      try
+      {
+        fs.writeFileSync(`uploads/${fileName}`, file.buffer);
+      }
+      catch(e)
+      {
+        return e as Error;
+      }
+
+      return true;
+      
+    }
+  }
+
+  async GetAvatar(userName: string)
+  {
+    
+  }
   
 }
 

@@ -21,6 +21,7 @@ import * as LocalSession from 'telegraf-session-local';
 import { NotifyModule } from './notify/notify.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { config } from './config';
+import { MulterModule } from '@nestjs/platform-express/multer';
 
 
 const sessions = new LocalSession({ database: 'session_db.json' });
@@ -49,6 +50,11 @@ export class DatabaseModule
     }),
     NotifyModule,
     ScheduleModule.forRoot(),
+    MulterModule.register({
+      dest: './upload'
+    })
+
+    
     // ConfigModule.forRoot({ isGlobal: true })
   ],
   providers: [
