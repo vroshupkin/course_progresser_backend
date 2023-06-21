@@ -1,74 +1,63 @@
-## Installation
+## Запуск проекта
+
+### 1. Загрузка библиотек
 
 ```bash
 npm i
+```
+
+### 2. Создание конфига
+
+Конфиг можно создать автоматически или с помощью скрипта
+
+* Автоматически
+
+```bash
 npm run preconfig
 ```
 
-## config.ts
+* В ручную создав файл - ./src/config.ts и заполнив его:
+  ```ts
+  import { IConfig } from './config.type';
 
-Конфигрурацинный файл находится в ./src/config.ts
+  export const config: IConfig = {
+    API_KEY: 'hello',
+    jwt_secret: 'DO NOT USE THIS VALUE. INSTEAD, CREATE A COMPLEX SECRET AND KEEP IT SAFE OUTSIDE OF THE SOURCE CODE.',
+    TELEGRAM_TOKEN: '${Ваш телеграм токен}'
+  };
+  ```
+
+### 3. Запуск базы данных
+
+Используется mongo на порту 27017
+
+```bash
+$ docker run -d -p 27017:27017 --name mongo mongo:latest
+```
+
+После запуска запуска базы данных и включения сервера, автоматически создастся база данных progresser
+
+### 4. Добавление админа
+
+Запуск терминала в контейнере
 
 ```ts
-import { IConfig } from './config.type';
+use('progresser')
 
-export const config: IConfig = {
-  API_KEY: 'hello',
-  jwt_secret: 'DO NOT USE THIS VALUE. INSTEAD, CREATE A COMPLEX SECRET AND KEEP IT SAFE OUTSIDE OF THE SOURCE CODE.',
-  TELEGRAM_TOKEN: '${Ваш телеграм токен}'
-};
-
+db.getCollection('users').insertOne({
+    userName: 'admin',
+    password: 'admin admin',
+    role: 'admin',
+});
 
 ```
 
-API_KEY???
+## Архитектура
 
-jwtConstants???
-
-В проекте настроен телеграм бот, для интеграции системы с вашим ботом
-
-## Running the app
-
-1. Создайте .env
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Система авторизация
+### Система авторизация
 
 Авторизация сделана на jwt токене.
 
 Используется глобальные гард AuthGuard, который отбрасывает всех неавторизованных пользователей.
 
 Для публичного эндпоинта используется декоратор [@Public](./src/auth/auth.decorators.ts)
-
-## Запуск базы данных
-
-Используется mongo db.
-
-```bash
-gdfgfd
-
-
-```
