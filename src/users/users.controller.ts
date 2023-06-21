@@ -117,9 +117,18 @@ export class UsersController
     
     const filePath = join(process.cwd(), `/uploads/${param.userName}.jpg`);
 
-    const file = fs.createReadStream(filePath);
-    file.pipe(res);
-        
+    let file: fs.ReadStream;
+    try
+    {
+      file = fs.createReadStream(filePath);
+      file.pipe(res);
+    }
+    // TODO сделать возврат ошибки
+    catch(e)
+    {
+      console.log(e);
+    }
+
     return 'ok';
   }
   
