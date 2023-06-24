@@ -10,7 +10,7 @@ npm i
 
 Конфиг можно создать автоматически или с помощью скрипта
 
-* Автоматически
+* Автоматически. Команда запускает скрипт ./scripts/preconfig.sh
 
 ```bash
 npm run preconfig
@@ -18,12 +18,14 @@ npm run preconfig
 
 * В ручную создав файл - ./src/config.ts и заполнив его:
   ```ts
+
   import { IConfig } from './config.type';
 
   export const config: IConfig = {
     API_KEY: 'hello',
     jwt_secret: 'DO NOT USE THIS VALUE. INSTEAD, CREATE A COMPLEX SECRET AND KEEP IT SAFE OUTSIDE OF THE SOURCE CODE.',
-    TELEGRAM_TOKEN: '${Ваш телеграм токен}'
+    TELEGRAM_TOKEN: '1263254746:AAE2GwCrPrpuBLZg_Qncck590H6KcuiC3I8',
+    port: 3000
   };
   ```
 
@@ -39,7 +41,7 @@ $ docker run -d -p 27017:27017 --name mongo mongo:latest
 
 ### 4. Добавление админа
 
-Запуск терминала в контейнере
+Запустите mongosh и введите:
 
 ```ts
 use('progresser')
