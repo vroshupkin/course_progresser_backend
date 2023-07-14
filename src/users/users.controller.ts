@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors, Scope, Inject, Query, Header } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateDto, CreateResponseError, CreateResponseFail, CreateResponseSuccess, DeleteDto, GetUserDto  } from './user.dto';
-import { Response, query, request } from 'express';
+import { Response } from 'express';
 import { ErrorResponse } from 'src/common/common.types';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiProperty, ApiQuery, ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { curry } from 'ramda';
@@ -90,45 +90,44 @@ export class UsersController
   @ApiBearerAuth()
 
   @ApiOperation({ summary: 'Загружает аватар пользователя' })
-  async uploadAvatar(@Body() body: {userName: string}, @UploadedFile() file: Express.Multer.File)
+  async uploadAvatar(@Body() body: {userName: string}, @UploadedFile() file: Express.Multer.File, @Res() res: Response)
   {
-    const error = this.usersService.UploadAvatar(file, body.userName);
 
-    if(error instanceof Error)
-    {
-      return error;
-    }
+    await this.usersService.UploadAvatar(file, body.userName);    
     
     return 'ok';
   }
 
 
-  @Get('get-avatar/:userName')
+  @Get('get-avatar_*')
 
   @HttpCode(200)
   @ApiBearerAuth()
 
   @ApiOperation({ summary: 'Получает аватар пользователя' })
   @Header('Content-Type', 'image/jpg')
-  async getAvatar(@Param() param: {userName: string}, @Res() res: Response) 
+  async getAvatar(@Param() param: {userName: string}, @Res() res: Response, @Query() query) 
   {
 
     res.set('Content-Type', 'image/jpg');
     
-    const filePath = join(process.cwd(), `/uploads/${param.userName}.jpg`);
-
-    let file: fs.ReadStream;
-    try
+    const fileList = fs.readdirSync('uploads').filter(str => str.includes(param[0]));
+    
+    // TODO сделать чтобы точно с именем файла было
+    // TODO вынести в сервис
+    if(fileList.length >= 1)
     {
-      file = fs.createReadStream(filePath);
+      const file = fs.createReadStream(`uploads/${fileList[0]}`);
       file.pipe(res);
     }
-    // TODO сделать возврат ошибки
-    catch(e)
+    else if(fileList.length === 0)
     {
-      console.log(e);
+      res.status(404);
+      
+      return 'Image don\'t find';
     }
 
+    
     return 'ok';
   }
   

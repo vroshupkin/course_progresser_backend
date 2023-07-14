@@ -5,6 +5,7 @@ import { User } from './users.schema';
 import { CreateDto,  UpdateUserDto } from './user.dto';
 import { validateDocument } from 'src/common/validators';
 import * as fs from 'fs';
+import { get_file_extension } from 'src/common/get_file_extension';
 
 @Injectable()
 export class UsersService
@@ -92,20 +93,17 @@ export class UsersService
   {
     if(file)
     {
-      const file_extension = file.originalname.split('.')[1];
+      fs.existsSync('uploads');
+      if(!fs.existsSync('uploads'))
+      {
+        fs.mkdirSync('uploads');        
+      }
+
+      const file_extension = get_file_extension(file.originalname);
       const fileName = `${userName}.${file_extension}`;
+      fs.writeFileSync(`uploads/${fileName}`, file.buffer);
 
-      try
-      {
-        fs.writeFileSync(`uploads/${fileName}`, file.buffer);
-      }
-      catch(e)
-      {
-        return e as Error;
-      }
 
-      return true;
-      
     }
   }
 
