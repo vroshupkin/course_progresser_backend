@@ -1,12 +1,12 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors, Scope, Inject, Query, Header } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateDto, CreateResponseError, CreateResponseFail, CreateResponseSuccess, DeleteDto, GetUserDto  } from './user.dto';
-import { Response } from 'express';
-import { ErrorResponse } from 'src/common/common.types';
+import { CreateDto, CreateResponseError, CreateResponseFail, CreateResponseSuccess, DeleteDto, GetUserDto, GetUserResponseDto  } from './user.dto';
+import { Request, Response } from 'express';
+import { ErrorResponse } from '../common/common.types';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiProperty, ApiQuery, ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { curry } from 'ramda';
-import { AdminGuard } from 'src/auth/auth.guard';
-import { Public } from 'src/auth/auth.decorators';
+import { AdminGuard } from '../auth/auth.guard';
+import { Public } from '../auth/auth.decorators';
 import { FileInterceptor, MulterModule } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import { REQUEST } from '@nestjs/core';
@@ -34,19 +34,29 @@ export class UsersController
   @Get('getUser')
   
   @ApiOperation({ summary: 'Возвращает данные пользователя' })
-  @ApiResponse({ status: HttpStatus.OK, type: GetUserDto })
+  @ApiResponse({ status: HttpStatus.OK, type: GetUserResponseDto })
   @ApiParam({ name: 'userName', required: true, description: 'Имя пользователя' })
   @ApiBearerAuth()
-  async getUser(@Param('userName') param: {userName: string})
+  // TODO сделать что то с валидатором param. Если не приходит параметр то падает контроллер
+  async getUser(@Param('userName') param: GetUserDto)
   {
-    const user = await this.usersService.FindOne(param.userName);
+    // console.log(param);
     
-    if(user == null)
+    if(param)
     {
-      return `Пользователя с именем = ${param.userName} не найдено`;
+      const user = await this.usersService.FindOne(param.userName);
+      if(user)
+      {
+        return user;    
+      }
+      else
+      {
+        return `Пользователя с именем = ${param.userName} не найдено`;
+      }
     }
-     
-    return user;
+
+    return 'ERROR';
+    
   }
 
 
@@ -87,15 +97,20 @@ export class UsersController
   @UseInterceptors(FileInterceptor('file'))
 
   @HttpCode(202)
+
   @ApiBearerAuth()
-
   @ApiOperation({ summary: 'Загружает аватар пользователя' })
-  async uploadAvatar(@Body() body: {userName: string}, @UploadedFile() file: Express.Multer.File, @Res() res: Response)
+  async uploadAvatar(@UploadedFile() file: Express.Multer.File,  @Req() req: Request, @Res({ passthrough: true }) res: Response)
   {
+    if(file)
+    {      
+      this.usersService.UploadAvatar(file, req.body.userName);    
 
-    await this.usersService.UploadAvatar(file, body.userName);    
+      return 'ok';
+    }
+
+    return 'error';
     
-    return 'ok';
   }
 
 
@@ -111,17 +126,21 @@ export class UsersController
 
     res.set('Content-Type', 'image/jpg');
     
-    const fileList = fs.readdirSync('uploads').filter(str => str.includes(param[0]));
-    
-    // TODO сделать чтобы точно с именем файла было
+    const formats = [ 'jpg', 'png', 'jpeg' ] as const;
+    const fileList = formats
+      .map(format => `uploads/${param[0]}.${format}`)
+      .filter(fileName => fs.existsSync(fileName))
+    ;
+
     // TODO вынести в сервис
     if(fileList.length >= 1)
     {
-      const file = fs.createReadStream(`uploads/${fileList[0]}`);
+      const file = fs.createReadStream(`${fileList[0]}`);
       file.pipe(res);
     }
     else if(fileList.length === 0)
     {
+      // console.log('error!');
       res.status(404);
       
       return 'Image don\'t find';

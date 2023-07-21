@@ -2,7 +2,7 @@ import { Body, Catch, Controller, HttpCode, HttpStatus, Post, Req, Res, SetMetad
 import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { RefreshTokenDto, SignInRequest } from './auth.dto';
-import { ErrorResponse } from 'src/common/common.types';
+import { ErrorResponse } from '../common/common.types';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtService } from '@nestjs/jwt';

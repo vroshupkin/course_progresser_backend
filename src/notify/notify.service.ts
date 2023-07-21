@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Cron, Interval } from '@nestjs/schedule';
 import { Model } from 'mongoose';
 import { InjectBot } from 'nestjs-telegraf';
-import { User } from 'src/users/users.schema';
+import { User } from '../users/users.schema';
 import { Context, Telegraf }from 'telegraf';
 import { ChatId } from './notify.schema';
 
@@ -47,14 +47,8 @@ export class NotifyService
       throw new NotFoundException();
     }
     
-    // console.log(user.userName);
-    // console.log(user.password);
-    // console.log(user.id);
-    // const createChatId = new this.chatIdModel({ chatId: chatId, user: { userName: userName, password: user.password } });
-
     const find_chatId = await this.userModel.findOne({ _id: user.id });
 
-    console.log(find_chatId);
     if(find_chatId != null)
     {
       console.log(find_chatId);

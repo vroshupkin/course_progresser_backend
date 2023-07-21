@@ -1,12 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { ExistInObjValidator,  ValidatorError, Validators } from 'src/common/validator_error';
-import { validateDocument } from 'src/common/validators';
-import { User } from 'src/users/users.schema';
-import { UsersService } from 'src/users/users.service';
+import { ExistInObjValidator,  ValidatorError, Validators } from '../common/validator_error';
+import { validateDocument } from '../common/validators';
+import { User } from '../users/users.schema';
+import { UsersService } from '../users/users.service';
 import { RefreshTokenDto, SignInRequest, SignInResponse,  TSignIn } from './auth.dto';
-import { ErrorResponse, ResponseValidatorError } from 'src/common/common.types';
+import { ErrorResponse, ResponseValidatorError } from '../common/common.types';
 import { JwtService } from '@nestjs/jwt';
-import { UpdateUserDto } from 'src/users/user.dto';
+import { UpdateUserDto } from '../users/user.dto';
 import { BadRequestError } from 'passport-headerapikey';
 
 @Injectable()

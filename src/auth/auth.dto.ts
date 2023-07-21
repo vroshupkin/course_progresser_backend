@@ -1,6 +1,6 @@
-import { ErrorResponse, ResponseStatus, ResponseValidatorError, SuccessRespons as SuccessResponse } from 'src/common/common.types';
-import { ValidatorError } from 'src/common/validator_error';
-import { TFromKey } from 'src/common/common.types';
+import { ErrorResponse, ResponseStatus, ResponseValidatorError, SuccessResponse as SuccessResponse } from '../common/common.types';
+import { ValidatorError } from '../common/validator_error';
+import { TFromKey } from '../common/common.types';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class SignInRequest

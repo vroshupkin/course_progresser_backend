@@ -1,5 +1,5 @@
 import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
-import { Public } from 'src/auth/auth.decorators';
+import { Public } from '../auth/auth.decorators';
 import { NotifyService } from './notify.service';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { NotifyRegisterDto, NotifyReqDto } from './notify.dto';

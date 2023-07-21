@@ -9,9 +9,9 @@ import { JwtService } from '@nestjs/jwt';
 import { IS_PUBLIC_KEY } from './constants';
 import { Request } from 'express';
 import { Reflector } from '@nestjs/core';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from '../users/users.service';
 import { Observable } from 'rxjs';
-import { config } from 'src/config';
+import { config } from '../config';
 
 @Injectable()
 export class AdminGuard implements CanActivate 

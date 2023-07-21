@@ -4,8 +4,8 @@ import { NotifyService } from './notify.service';
 import { NotifyController } from './notify.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ChatId, ChatIdSchema } from './notify.schema';
-import { User, UserSchema } from 'src/users/users.schema';
-import { UsersModule } from 'src/users/users.module';
+import { User, UserSchema } from '../users/users.schema';
+import { UsersModule } from '../users/users.module';
 
 
 @Module(

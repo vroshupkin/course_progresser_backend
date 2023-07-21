@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory, raw } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { User } from 'src/users/users.schema';
+import { User } from '../users/users.schema';
 
 @Schema()
 export class ChatId
