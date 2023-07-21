@@ -17,7 +17,7 @@ npm run preconfig
 ```
 
 * В ручную создав файл - ./src/config.ts и заполнив его:
-  ```ts
+  ```typescript
 
   import { IConfig } from './config.type';
 
