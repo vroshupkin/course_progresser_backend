@@ -1,4 +1,7 @@
 
+/**
+ * Получает расширение файла по его пути
+ */
 export const get_file_extension = (file_name: string) => 
 {
   for(let i = file_name.length - 1; i >= 0; i--)
