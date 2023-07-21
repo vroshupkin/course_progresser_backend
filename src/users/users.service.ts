@@ -3,10 +3,9 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './users.schema';
 import { CreateDto,  UpdateUserDto } from './user.dto';
-import { validateDocument } from 'src/common/validators';
 import * as fs from 'fs';
-import { get_file_extension } from 'src/common/get_file_extension';
-
+import { get_file_extension } from '../common/get_file_extension';
+import { validateDocument } from '../common/validators';
 @Injectable()
 export class UsersService
 {
@@ -58,12 +57,11 @@ export class UsersService
   {
     const res = this.userModel.findOne({ userName: userName });
     
-    console.log(userName);
     
     return  res;
   }
 
-  async Update(updateUserDto: UpdateUserDto): Promise<any>
+  async Update(updateUserDto: UpdateUserDto)
   {
     const res = this.userModel.updateOne({ userName: updateUserDto.userName }, updateUserDto);
     
@@ -89,12 +87,11 @@ export class UsersService
     return res.role;
   }
   
-  async UploadAvatar(file: Express.Multer.File, userName: string)
+  UploadAvatar(file: Express.Multer.File, userName: string)
   {
     if(file)
     {
-      fs.existsSync('uploads');
-      if(!fs.existsSync('uploads'))
+      if(!fs.existsSync('uploads')) 
       {
         fs.mkdirSync('uploads');        
       }
@@ -103,7 +100,7 @@ export class UsersService
       const fileName = `${userName}.${file_extension}`;
       fs.writeFileSync(`uploads/${fileName}`, file.buffer);
 
-
+      
     }
   }
 

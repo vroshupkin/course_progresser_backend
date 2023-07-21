@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { ErrorResponse, N_aryOperator, ResponseStatus } from 'src/common/common.types';
-import { ValidatorError } from 'src/common/validator_error';
+import { ErrorResponse, N_aryOperator, ResponseStatus } from '../common/common.types';
+import { ValidatorError } from '../common/validator_error';
 
 
 export class CreateDto
@@ -14,8 +14,14 @@ export class CreateDto
   @ApiPropertyOptional({ example: 'Smith' })
     lastName?: string;
   
-
 }
+
+// export class GetUserDto
+// {
+//   @ApiProperty({ example: 'admin' })
+//     userName: string;
+// }
+
 
 export class UpdateUserDto
 {
@@ -72,8 +78,13 @@ export class CreateResponseErrorUserExist extends ErrorResponse
   }
 }
 
-
 export class GetUserDto
+{
+  @ApiProperty({ example: 'admin' })
+    userName: string;  
+}
+
+export class GetUserResponseDto
 { 
   @ApiProperty({ description: 'Имя пользователя' })
     userName: string;  
