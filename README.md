@@ -16,7 +16,7 @@ npm i
 npm run preconfig
 ```
 
-* В ручную создав файл - ./src/config.ts и заполнив его:
+* Вручную создав файл - ./src/config.ts и заполнив его:
   ```typescript
 
   import { IConfig } from './config.type';
@@ -63,3 +63,27 @@ db.getCollection('users').insertOne({
 Используется глобальные гард AuthGuard, который отбрасывает всех неавторизованных пользователей.
 
 Для публичного эндпоинта используется декоратор [@Public](./src/auth/auth.decorators.ts)
+
+# Postgres
+
+## Вход в psql контейнера
+
+Чтобы зайти в терминал cli postgres psql:
+
+1. Убедитесь что переменные окружение контейнера присутствуют, к примеру такие:
+
+```json
+{
+	POSTGRES_USER: "admin",
+	POSTGRES_PASSWORD: "qwerty",
+	POSTGRES_DB: "calories"
+}
+```
+
+2. Используя переменные окружение заходим в консоль
+
+```bash
+docker exec -it calories-postgres-1 psql -U admin -W calories
+```
+
+3. Вводим пароль
