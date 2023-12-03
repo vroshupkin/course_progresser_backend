@@ -18,28 +18,34 @@ export class AuthService
   ) 
   {}
 
-  async signIn(dto: SignInRequest)
+  private checkPassword()
+  {
+
+  }
+
+
+  async signIn(pass_data: SignInRequest)
   {
 
     const error_message = {
-      login_error: dto.userName.length == 0 || !dto.userName? 'Имя пользователя должно быть передано' : '',
-      password_error: dto.password.length == 0 || !dto.password? 'Пароль должен быть передан' : ''
+      login_error: !pass_data.userName.length || !pass_data.userName? 'Имя пользователя должно быть передано' : '',
+      password_error: !pass_data.password.length || !pass_data.password? 'Пароль должен быть передан' : ''
     };
     
-    if(error_message.login_error.length > 0 || error_message.password_error.length > 0)
+    if(error_message.login_error.length || error_message.password_error.length )
     {
       throw new BadRequestError(error_message);
     }
     
-    const user = await this.userService.FindOne(dto.userName);
+    const user = await this.userService.FindOne(pass_data.userName);
 
-
+    
     if(user == null)
     {
       throw new BadRequestError({ login_error: 'Неверно задан логин' });
     }
 
-    if(user.password != dto.password)
+    if(user.password != pass_data.password)
     {
       throw new BadRequestError({ password_error: 'Неверно задан пароль' });
     }
