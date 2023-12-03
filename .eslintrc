@@ -22,6 +22,7 @@
 	"@typescript-eslint/explicit-module-boundary-types": "off",
 	"@typescript-eslint/no-namespace": "off",
 	"@typescript-eslint/no-explicit-any": "off",
+	"@typescript-eslint/ban-ts-comment": "off",
 	"curly": "error",
 	"brace-style": ["error", "allman", { "allowSingleLine": true }],
 	"quotes": ["error", "single"],
@@ -35,7 +36,8 @@
 	"newline-before-return": ["error"],
 	"object-curly-spacing": ["error", "always"],
 	"array-bracket-spacing": ["error", "always"],
-	"no-unreachable": "error"
+	"no-unreachable": "error",
+	
 	
   }
 }
