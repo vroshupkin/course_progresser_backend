@@ -6,7 +6,7 @@ export type TFromKey<T> = T[keyof T]
 
 export type ResponseStatus = 'success' | 'error'
 
-export abstract class SuccessRespons
+export abstract class SuccessResponse
 {
   status: ResponseStatus = 'success';
 }
