@@ -1,4 +1,4 @@
-import { ErrorResponse, ResponseStatus, ResponseValidatorError, SuccessResponse as SuccessResponse } from '../common/common.types';
+import { ErrorResponse, ResponseStatus, ResponseValidatorError, SuccessResponse } from '../common/common.types';
 import { ValidatorError } from '../common/validator_error';
 import { TFromKey } from '../common/common.types';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
