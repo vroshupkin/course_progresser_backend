@@ -2,17 +2,19 @@ import { Injectable, Module } from '@nestjs/common';
 import { Client } from 'pg';
 import * as chalk from 'chalk';
 import { MongooseModule } from '@nestjs/mongoose';
+import { config } from '../config';
 
 @Injectable({})
 export class PostgresService
 {
   public client: Client;
+
   private options = {
-    port: 5432,
-    host:'localhost',
+    port: config.postgres.port, 
+    host: config.postgres.host,
     database: 'calories',
     user: 'admin',
-    password: 'qwerty',
+    password: 'qwerty'
   };
 
   constructor()
@@ -79,7 +81,7 @@ export class PostgresService
 
 
 @Module({
-  imports : [ MongooseModule.forRoot('mongodb://localhost/progresser') ],
+  imports : [ MongooseModule.forRoot(config.mongo_host) ],
   providers: [ PostgresService ],
   exports: [ PostgresService ]
   

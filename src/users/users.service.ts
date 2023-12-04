@@ -6,15 +6,34 @@ import { CreateDto,  UpdateUserDto } from './user.dto';
 import * as fs from 'fs';
 import { get_file_extension } from '../common/get_file_extension';
 import { validateDocument } from '../common/validators';
+import { PostgresService } from '../database/database.module';
+import { faker } from '@faker-js/faker';
+import { createHash } from 'node:crypto';
+import { create } from 'domain';
+import * as chalk from 'chalk';
+
 @Injectable()
 export class UsersService
 {
   constructor(
     @InjectModel(User.name)
-    private userModel: Model<User>
+    private userModel: Model<User>,
+    private pgService: PostgresService
   )
   {
-      
+    this.async_init();
+  }
+
+  async async_init()
+  {
+    // const username = faker.internet.userName();
+    
+    // await this.pgService.client.query(`INSERT INTO "users" (username) VALUES ('${username}');`);
+    // const res = await this.pgService.client.query('SELECT * FROM "users"');
+    // console.log(res.rows);
+
+    console.log(await this.addUser('Hello epta', 'parol_epta'));
+
   }
 
   async Create(request: CreateDto) 
@@ -31,6 +50,7 @@ export class UsersService
     createUser.role = 'user';
     
     const schemaValidate = await validateDocument(createUser);
+    
     if(schemaValidate.length > 0)
     {
       throw new BadRequestException(schemaValidate);
@@ -87,6 +107,33 @@ export class UsersService
     return res.role;
   }
   
+  /**
+ * Получает пользователя со всеми полями
+ */
+  async getUser(username?: string)
+  {
+    const query = 'SELECT * from "users"' + (username != undefined? `WHERE username =${username}` : '');
+    
+    return await this.pgService.client.query(query);
+  }
+
+  /**
+ * Получает пользователя со всеми полями
+ */
+  async addUser(username: string, password: string)
+  {
+
+    password += 'Hrani sol taino!';
+
+    const new_password = createHash('sha256').update(password).digest('hex');
+    
+
+    const user_server_tittle  = str => chalk.green(str) => chalk.bgCyan() ('UsersService - addUser(any)\n')();
+    const message = user_server_tittle + chalk.redBright(new_password);
+    console.log(message);
+    // return await this.pgService.client.query(query);
+  }
+
   UploadAvatar(file: Express.Multer.File, userName: string)
   {
     if(file)
