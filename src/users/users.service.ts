@@ -128,7 +128,7 @@ export class UsersService
     const new_password = createHash('sha256').update(password).digest('hex');
     
 
-    const user_server_tittle  = str => chalk.green(str) => chalk.bgCyan() ('UsersService - addUser(any)\n')();
+    // const user_server_tittle  = str => chalk.green(str) => chalk.bgCyan() ('UsersService - addUser(any)\n')();
     const message = user_server_tittle + chalk.redBright(new_password);
     console.log(message);
     // return await this.pgService.client.query(query);
