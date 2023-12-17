@@ -19,10 +19,14 @@ export class PostgresService
 
   constructor()
   { 
-    
-    this.connect();
   }
   
+  async init()
+  {
+    await this.connect();
+    
+    return this;
+  }
   /**
    * Подключение
    */
@@ -31,7 +35,6 @@ export class PostgresService
     this.client = new Client(this.options);
     await this.client.connect();
     
-    await this.client.query('-- INSERT INTO "users" (username) VALUES (\'hello\')');
 
     const querys = [
       'DELETE FROM users WHERE username = \'test\';',
@@ -45,7 +48,7 @@ export class PostgresService
       last_result = await this.client.query(query);
     }
 
-
+    
     last_result.rows[0] != undefined ?
       this.connectionSuccess() :
       this.connectionFail();

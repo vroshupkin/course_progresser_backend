@@ -1,5 +1,5 @@
 import mongoose, { Model, Document } from 'mongoose';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './users.schema';
 import { CreateDto,  UpdateUserDto } from './user.dto';
