@@ -1,14 +1,11 @@
 import { FormatingFactory } from '../../common/validators';
+import test from 'ava';
 
 
-describe('FormatingFactory()', () => 
+test('FormatingFactory()', (t) => 
 {
-
-  const Formating = FormatingFactory('{$}');
-  test('I will have 1 million $', () => 
-  {
-    const res = Formating('1 million ')('I will have {$}$');
+  const res = FormatingFactory('{$}')('1 million ')('I will have {$}$');
     
-    expect(res).toBe('I will have 1 million $');
-  });
+  t.true(res === 'I will have 1 million $');
+
 });

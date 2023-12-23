@@ -1,5 +1,21 @@
+// interface Iterable<T>{
+//   [Symbol.iterator](): {
+//     next(): {
+//       value: T,
+//       done: boolean
+//     }
+//   }
+// }
+type TIterableReturn<T> = {
+  value: T,
+  done: boolean,
+}
+abstract class Iterable<T>
+{ 
+  abstract next(): TIterableReturn<T>
+}
 
-export class TwoArrayIterationProtocol<T1, T2>
+export class TwoArrayIterationProtocol<T1, T2> implements Iterable<[T1, T2]>
 {
   private i = 0;
   private len: number;
@@ -20,21 +36,20 @@ export class TwoArrayIterationProtocol<T1, T2>
     
     this.i++;
     
+    const value: [T1, T2] = [ arr1[i], arr2[i] ];
+
     return{
-      value: [ arr1[i], arr2[i] ],
+      value,
       done: i >= this.len            
     };
   }
 
 }
-
-// const proxy = new Proxy(obj, {
-//   get(target, p)
-//   {
-//     return [ target.arr_1[p] ];
-//   }
-// });
-
+/**
+ * @example 
+ * equlity_set(new Set(['a']), new Set(['a'])) => true
+ * equlity_set(new Set(['a']), new Set(['b'])) => false
+ */
 function equlity_set(s1: Set<any>, s2: Set<any>)
 {
   if(s1.values.length != s2.values.length){return false;}
@@ -47,10 +62,11 @@ function equlity_set(s1: Set<any>, s2: Set<any>)
   return true;
 }
 
-export function SetOperation(s1: Set<any>, op: '==', s2: Set<any>)
+
+export class ExtendSet<T> extends Set<T>
 {
-  if(op == '==')
-  {
-    return equlity_set(s1, s2);
-  }
+  equal = (s2: Set<T> | ExtendSet<T>) => equlity_set(this, s2);
+  notEqual = (s2: Set<T> | ExtendSet<T>) => !equlity_set(this, s2); 
 }
+
+

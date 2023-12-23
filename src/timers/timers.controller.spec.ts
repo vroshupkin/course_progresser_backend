@@ -1,21 +1,25 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TimersController } from './timers.controller';
+import test from 'ava';
 
-describe('TimersController', () => 
+
+let controller: TimersController;
+let module_ref: TestingModule;
+
+test.before(async () => 
 {
-  let controller: TimersController;
+  module_ref  = await Test.createTestingModule({
+    controllers: [ TimersController ],
+  }).compile();
 
-  beforeEach(async () => 
-  {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [ TimersController ],
-    }).compile();
-
-    controller = module.get<TimersController>(TimersController);
-  });
-
-  it('should be defined', () => 
-  {
-    expect(controller).toBeDefined();
-  });
+  
+  controller = module_ref.get(TimersController);
 });
+
+test('should be defined', (t) => 
+{
+  t.true(controller !== undefined);
+});
+
+
+test.after(() => module_ref.close());

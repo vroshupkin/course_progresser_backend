@@ -1,21 +1,22 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TimersService } from './timers.service';
+import test from 'ava';
 
-describe('TimersService', () => 
+let service: TimersService;
+let module_ref: TestingModule;
+
+test.beforeEach(async () => 
 {
-  let service: TimersService;
+  module_ref = await Test.createTestingModule({
+    providers: [ TimersService ],
+  }).compile();
 
-  beforeEach(async () => 
-  {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [ TimersService ],
-    }).compile();
-
-    service = module.get<TimersService>(TimersService);
-  });
-
-  it('should be defined', () => 
-  {
-    expect(service).toBeDefined();
-  });
+  service = module_ref.get(TimersService);
 });
+
+  
+test('TimersService', (t) => 
+{
+  t.true(service !== undefined && service !== null);
+});
+

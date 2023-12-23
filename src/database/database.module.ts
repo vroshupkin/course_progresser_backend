@@ -21,12 +21,19 @@ export class PostgresService
   { 
   }
   
-  async init()
+  async onApplicationBootstrap()
   {
-    await this.connect();
     
-    return this;
+    try
+    {
+      await this.connect();
+    }
+    catch(err)
+    {
+      console.error(err);
+    }
   }
+  
   /**
    * Подключение
    */
@@ -79,6 +86,11 @@ export class PostgresService
     
     console.log(postgres + ne_ydalos + s_database, adress);
     
+  }
+
+  onModuleDestroy()
+  {
+    this.client.end();
   }
 }
 
