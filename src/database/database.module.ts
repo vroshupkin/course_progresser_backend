@@ -40,26 +40,15 @@ export class PostgresService
   async connect()
   {
     this.client = new Client(this.options);
-    await this.client.connect();
-    
-
-    const querys = [
-      'DELETE FROM users WHERE username = \'test\';',
-      'INSERT INTO "users" (username) VALUES (\'test\')',
-      'SELECT * from users WHERE username = \'test\''
-    ];
-    
-    let last_result;
-    for (const query of querys) 
+    try
     {
-      last_result = await this.client.query(query);
+      await this.client.connect();  
     }
-
-    
-    last_result.rows[0] != undefined ?
-      this.connectionSuccess() :
+    catch(err)
+    {
+      console.error(err);
       this.connectionFail();
-   
+    }
     
   }
 

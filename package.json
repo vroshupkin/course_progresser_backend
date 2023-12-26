@@ -14,10 +14,6 @@
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "ava --node-arguments=--no-warnings -T=20s",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
     "preconfig": "sh ./scripts/preconfig.sh"
   },
   "dependencies": {
@@ -71,7 +67,6 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "faucet": "^0.0.4",
-    "jest-mock": "^29.6.1",
     "jiti": "^1.21.0",
     "prettier": "^2.3.2",
     "source-map-support": "^0.5.20",
@@ -81,30 +76,12 @@
     "tap-prettify": "^0.0.2",
     "tap-simple": "^0.3.1",
     "tap-summary": "^4.0.0",
-    "ts-jest": "29.0.5",
     "ts-loader": "^9.2.3",
     "ts-node": "^10.0.0",
     "tsconfig-paths": "4.2.0",
     "tsx": "^4.6.2",
     "typescript": "^4.9.4",
     "uvu": "^0.5.6"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "ts"
-    ],
-    "rootDir": "src",
-    "testRegex": ".*\\.spec\\.ts$",
-    "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
-    },
-    "collectCoverageFrom": [
-      "**/*.(t|j)s"
-    ],
-    "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
   },
   "ava": {
     "typescript": {

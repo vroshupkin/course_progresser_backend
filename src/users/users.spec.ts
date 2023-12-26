@@ -98,3 +98,21 @@ test.after(async (t) =>
 });
 
 
+//   const querys = [
+//     'DELETE FROM users WHERE username = \'test\';',
+//     'INSERT INTO "users" (username) VALUES (\'test\')',
+//     'SELECT * from users WHERE username = \'test\''
+//   ];
+    
+//   let last_result;
+//   for (const query of querys) 
+//   {
+//     last_result = await this.client.query(query);
+//   }
+
+    
+//   last_result.rows[0] != undefined ?
+//     this.connectionSuccess() :
+//     this.connectionFail();
+   
+    

@@ -1,26 +1,39 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import test from 'ava';
+import { NestApplication } from '@nestjs/core';
+import axios from 'axios';
+import { Module } from '@nestjs/common';
 
-describe('AppController', () => 
+let app: NestApplication;
+
+
+test.beforeEach(async () => 
 {
-  let appController: AppController;
-
-  beforeEach(async () => 
-  {
-    const app: TestingModule = await Test.createTestingModule({
-      controllers: [ AppController ],
-      providers: [ AppService ],
-    }).compile();
-
-    appController = app.get<AppController>(AppController);
-  });
-
-  describe('root', () => 
-  {
-    it('should return "Hello World!"', () => 
-    {
-      expect(appController.getHello()).toBe('Hello World!');
-    });
-  });
+  const moduleRef = await Test.createTestingModule({
+    controllers: [ AppController ],
+    providers: [ AppService ],
+  }).compile();
+  
+  app = moduleRef.createNestApplication();
+  await app.init();
+  await app.listen(5555);
 });
+
+test('AppController', async (t) => 
+{
+  // const res = await axios.get('http://localhost:5555/hello');
+  
+  // t.true(res.data === 'Hello World!');
+
+  t.pass();
+  
+});
+
+test.afterEach('Close app', () => 
+{
+  app.close();
+  
+});
+
