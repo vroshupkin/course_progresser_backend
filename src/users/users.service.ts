@@ -9,7 +9,6 @@ import { validateDocument } from '../common/validators';
 import { PostgresService } from '../database/database.module';
 import { faker } from '@faker-js/faker';
 import { createHash } from 'node:crypto';
-import { create } from 'domain';
 import * as chalk from 'chalk';
 
 @Injectable()

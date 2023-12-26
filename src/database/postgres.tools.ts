@@ -15,7 +15,13 @@ export const DATABASE_STRUCT = {
     role: 'character varying'
   },
   calories: {
-
+    calories: 'integer',
+    day: 'timestamp without time zone',
+    user_id: 'integer'
+  },
+  usersauth: {
+    id: 'integer',
+    password: 'character varying',
   }
 };
 

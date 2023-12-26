@@ -43,6 +43,8 @@ export class PostgresService
     try
     {
       await this.client.connect();  
+      this.connectionSuccess();
+      
     }
     catch(err)
     {
