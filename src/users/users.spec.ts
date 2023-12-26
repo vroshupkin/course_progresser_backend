@@ -76,7 +76,6 @@ test.serial('Database check column names ', async (t) =>
     actual[table_name][column_name] = data_type;
   });
   
-  
   t.deepEqual(actual, DATABASE_STRUCT);
   
   
@@ -99,9 +98,21 @@ test.serial('Database check table names', async (t) =>
 
 });
 
-test.serial('CRUD', async (t) => 
+test.serial('CRUD user', async (t) => 
 {
-  t.true(1 === 1);
+  
+  const username = 'new User 1';
+
+  await user_service2.deleteUserByUsername(username);
+  await user_service2.addUser(username);
+  const user = await user_service2.getUserByName(username, [ 'username' ]);
+  
+  t.true(user.username === username);
+  
+  await user_service2.deleteUserByUsername(username);
+  const deleted_user = await user_service2.getUserByName(username, [ 'username' ]);
+  t.true(deleted_user === null);
+  
 });
 
 
@@ -109,4 +120,5 @@ test.after(async (t) =>
 {
   await app.close();
 });
+
 

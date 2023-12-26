@@ -1,5 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { PostgresService } from '../database/database.module';
+import { TTableColumn } from '../database/postgres.tools';
+import { QueryBuilder as QB } from '../common/query_builder';
+  
 
 @Injectable()
 export class UsersService2
@@ -10,27 +13,50 @@ export class UsersService2
     
   }
 
+  /**
+   * 
+   * @param username Имя пользователя
+   * @param column_names Колонки в таблице "users"
+   * @returns null or user
+   */
+  async getUserByName(
+    username: string,
+    column_names: (TTableColumn<'users'>)[] = [ 'username' ])
+  {    
+    
+    const query_str = QB.select('users', column_names, `username='${username}'`);
 
-  async getUserByName(username: string)
-  {
-    // const result = await this.postgresService.client.query(`SELECT * from "users" where username='${username}';`);
-    
-    const table = 'users';
-    const query = `select column_name from information_schema.columns where table_name='${table}';`;
-    const result = await this.postgresService.client.query(query);
-    
-    
-    // console.log(result);
-    // Если находит пользователя с именем username, то возвращает его, иначе null
+    const result = await this.postgresService.client.query(query_str);
 
-    return result.rows ?? null;
+    return result.rows[0] ? result.rows[0] : null;
     
   }
 
-  addUser(username: string, password: string)
-  {
-    console.log('TODO');
+  async addUser(username: string)
+  {  
   // Регистрирует пользователя с именем пользователя username и паролем password
+    const query_str = QB.insert(
+      {
+        table_name: 'users',
+        columns: [ 'username' ],
+        values: [ username ],
+      }
+    );
+      
+    let result;
+    try
+    {
+      result = await this.postgresService.client.query(query_str);
+    }
+    catch(err)
+    {
+      console.error(err);
+      
+      return null;
+    }
+    
+    return result.rows[0] ? result.rows[0] : null;
+
   }
 
 
@@ -40,9 +66,27 @@ export class UsersService2
   // Находит пользователя по username и изменяет его значение так же как в поле fields
   } 
 
-  deleteUserByUsername(username: string)
+  /**
+    * Delete user by name
+    */
+  async deleteUserByUsername(username: string): Promise<null | true>
   {
-    console.log('TODO');
-  // Удаляет пользователя по его имени
+    const query = QB.delete({
+      table: 'users',
+      where_condition: `users.username='${username}'`
+    });
+
+    try
+    {
+      await this.postgresService.client.query(query);
+    }
+    catch(err)
+    {
+      console.error(err);
+      
+      return null;
+    } 
+
+    return true;
   }
 }

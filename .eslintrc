@@ -35,7 +35,7 @@
 	"newline-before-return": ["error"],
 	"object-curly-spacing": ["error", "always"],
 	"array-bracket-spacing": ["error", "always"],
-	"no-unreachable": "error",
+	"no-unreachable": "error"
 	
 	
   }
