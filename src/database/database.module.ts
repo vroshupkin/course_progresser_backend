@@ -73,7 +73,7 @@ export class PostgresService
     const postgres = chalk.redBright('POSTGRES: ');
     const ne_ydalos = chalk.whiteBright('Не удалось соединиться с СУБД и базой данных ');
     const s_database = chalk.blueBright(database);
-    const adress = chalk.yellowBright(`${host}: ${port}`);
+    const adress = chalk.yellowBright(`${host}:${port}`);
     
     console.log(postgres + ne_ydalos + s_database, adress);
     
