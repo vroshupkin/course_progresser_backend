@@ -22,6 +22,7 @@ export const DATABASE_STRUCT = {
   usersauth: {
     id: 'integer',
     password: 'character varying',
+    token: 'character varying'
   }
 };
 

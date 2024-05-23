@@ -1,15 +1,10 @@
-import { Body, Catch, Controller, HttpCode, HttpStatus, Post, Req, Res, SetMetadata, UseFilters, UseGuards } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { Response } from 'express';
-import { RefreshTokenDto, SignInRequest } from './auth.dto';
-import { ErrorResponse } from '../common/common.types';
-import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
-import { JwtService } from '@nestjs/jwt';
-import { BadRequestFilter } from './auth.filter';
-import { IS_PUBLIC_KEY } from './constants';
+import { Body, Controller, HttpCode, HttpStatus, Post, Req, Res, UseFilters } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Request, Response } from 'express';
 import { Public } from './auth.decorators';
-import { Request } from 'express';
+import { RefreshTokenDto, SignInRequest } from './auth.dto';
+import { BadRequestFilter } from './auth.filter';
+import { AuthService } from './auth.service';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -24,20 +19,19 @@ export class AuthController
   @Public()
   @HttpCode(200)
   @UseFilters(new BadRequestFilter())
-
   @ApiOperation({ summary: 'Вход в приложение и получение jwt токена' })
-  async signIn(@Body() signInDto: SignInRequest, @Res() response: Response, @Req() request: Request)
+  async signIn(@Body() body: SignInRequest, @Res() response: Response, @Req() request: Request)
   {
     const errors = {
       userName: null as null | string,
       password: null as null | string
     };
 
-    if(typeof(signInDto.userName) != 'string')
+    if(!body.username)
     {
       errors.userName = 'Имя пользователя должно быть передано';
     }
-    if(typeof(signInDto.password) != 'string')
+    if(!body.password)
     {
       errors.password = 'Пароль должен быть передан';
     }
@@ -49,7 +43,7 @@ export class AuthController
       return;
     }
     
-    const res = await this.authService.signIn(signInDto);
+    const res = await this.authService.signIn(body);
      
     response.send(res);
   }

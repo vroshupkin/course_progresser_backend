@@ -6,14 +6,9 @@ import { ValidatorError } from '../common/validator_error';
 export class CreateDto
 {
   @ApiProperty({ example: 'user_1' })
-    userName: string;
+    username: string;
   @ApiProperty({ example: 'user_password' })
-    password: string;
-  @ApiPropertyOptional({ example: 'Richard' })
-    firstName?: string;
-  @ApiPropertyOptional({ example: 'Smith' })
-    lastName?: string;
-  
+    password: string; 
 }
 
 // export class GetUserDto

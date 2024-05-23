@@ -1,16 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import test, { Implementation, ImplementationFn } from 'ava';
-import { ConfigServiceTest } from '../config';
-import { ConfigService } from '@nestjs/config';
-import { PostgresService } from '../database/database.module';
 import { NestApplication } from '@nestjs/core';
+import { Test, TestingModule } from '@nestjs/testing';
+import test from 'ava';
+import { Client } from 'pg';
+import { PostgresService } from '../database/database.module';
+import { DATABASE_STRUCT } from '../database/postgres.tools';
 import { UsersService2 } from './users_postgres.service';
-import { DATABASE_STRUCT, TPostgresDataType, TTableColumn, check_database_field, pg_select_builder_query } from '../database/postgres.tools';
-import { Client, ClientBase } from 'pg';
 
-import { ExtendSet } from '../common/iteration_protocol';
-import { promise_with_timer } from '../common/promise_wrappers';
-import { table } from 'console';
 
 let app: NestApplication;
 let moduleRef: TestingModule;
@@ -22,7 +17,7 @@ test.before(async (t) =>
 {
   moduleRef = await Test.createTestingModule({
     providers: [ 
-      { useClass: ConfigServiceTest, provide: ConfigService },
+      // { useClass: ConfigServiceTest, provide: ConfigService },
       UsersService2,
       PostgresService
     ]
@@ -50,12 +45,12 @@ test.serial('Database connection', async (t) =>
 test.serial('Database check column names ', async (t) => 
 {
  
-  const toLowerCase = (str: string) => str.toLowerCase();
+  // const toLowerCase = (str: string) => str.toLowerCase();
 
   const where_condition = Object.keys(DATABASE_STRUCT)
-    .map(toLowerCase)
+    .map(str => str.toLowerCase())
     .map(table_name => `table_name='${table_name}'`).join(' OR ');
-
+  
   
   const res = await pg_client.query(`
     SELECT column_name, data_type, table_name 

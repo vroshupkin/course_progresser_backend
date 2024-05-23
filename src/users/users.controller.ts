@@ -1,17 +1,13 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors, Scope, Inject, Query, Header } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { CreateDto, CreateResponseError, CreateResponseFail, CreateResponseSuccess, DeleteDto, GetUserDto, GetUserResponseDto  } from './user.dto';
-import { Request, Response } from 'express';
-import { ErrorResponse } from '../common/common.types';
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiProperty, ApiQuery, ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
-import { curry } from 'ramda';
-import { AdminGuard } from '../auth/auth.guard';
-import { Public } from '../auth/auth.decorators';
-import { FileInterceptor, MulterModule } from '@nestjs/platform-express';
-import * as multer from 'multer';
+import { Body, Controller, Delete, Get, Header, HttpCode, HttpStatus, Inject, Param, Post, Query, Req, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Request, Response } from 'express';
 import * as fs from 'fs';
-import { join } from 'path';
+import { Public } from '../auth/auth.decorators';
+import { AdminGuard } from '../auth/auth.guard';
+import { CreateDto, DeleteDto, GetUserDto, GetUserResponseDto } from './user.dto';
+import { UsersService } from './users.service';
 
 @ApiTags('users')
 @Controller('users')
@@ -27,7 +23,7 @@ export class UsersController
   async getUsers()
   { 
 
-    return this.usersService.FindAll();
+    return this.usersService.findAll();
   }
 
 
@@ -44,7 +40,7 @@ export class UsersController
     
     if(param)
     {
-      const user = await this.usersService.FindOne(param.userName);
+      const user = await this.usersService.getUser(param.userName);
       if(user)
       {
         return user;    
@@ -65,11 +61,9 @@ export class UsersController
   @Public()
 
   @ApiOperation({ summary: 'Регистрирует нового пользователя' })
-  async createUser(@Body() userDtoAdd: CreateDto)
+  async register(@Body() userDtoAdd: CreateDto)
   {
-    await this.usersService.Create(userDtoAdd); 
-    
-    return 'ok';
+    return await this.usersService.create(userDtoAdd); 
   }
 
   
@@ -82,9 +76,9 @@ export class UsersController
   @ApiOperation({ summary: 'Удаляет пользователя' })
   async delete(@Body() deleteDto: DeleteDto)
   { 
-    const res = await this.usersService.Delete(deleteDto.userName);
+    const res = await this.usersService.delete(deleteDto.userName);
 
-    if(res.deletedCount === 0)
+    if(res === 0)
     {
       return `Пользователь с именем "${deleteDto.userName}" не найден`;  
     }
@@ -104,7 +98,7 @@ export class UsersController
   {
     if(file)
     {      
-      this.usersService.UploadAvatar(file, req.body.userName);    
+      this.usersService.uploadAvatar(file, req.body.userName);    
 
       return 'ok';
     }

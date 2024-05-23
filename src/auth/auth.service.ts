@@ -1,13 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { ExistInObjValidator,  ValidatorError, Validators } from '../common/validator_error';
-import { validateDocument } from '../common/validators';
-import { User } from '../users/users.schema';
-import { UsersService } from '../users/users.service';
-import { RefreshTokenDto, SignInRequest, SignInResponse,  TSignIn } from './auth.dto';
-import { ErrorResponse, ResponseValidatorError } from '../common/common.types';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UpdateUserDto } from '../users/user.dto';
 import { BadRequestError } from 'passport-headerapikey';
+import { UsersService } from '../users/users.service';
+import { RefreshTokenDto, SignInRequest } from './auth.dto';
 
 @Injectable()
 export class AuthService
@@ -18,18 +13,13 @@ export class AuthService
   ) 
   {}
 
-  private checkPassword()
-  {
 
-  }
-
-
-  async signIn(pass_data: SignInRequest)
+  async signIn(data: SignInRequest)
   {
 
     const error_message = {
-      login_error: !pass_data.userName.length || !pass_data.userName? 'Имя пользователя должно быть передано' : '',
-      password_error: !pass_data.password.length || !pass_data.password? 'Пароль должен быть передан' : ''
+      login_error: !data.username.length || !data.username? 'Имя пользователя должно быть передано' : '',
+      password_error: !data.password.length || !data.password? 'Пароль должен быть передан' : ''
     };
     
     if(error_message.login_error.length || error_message.password_error.length )
@@ -37,59 +27,60 @@ export class AuthService
       throw new BadRequestError(error_message);
     }
     
-    const user = await this.userService.FindOne(pass_data.userName);
+    // const user = await this.userService.FindOne(data.userName);
 
-    
-    if(user == null)
+    const { username, password, id } = await this.userService.getUser(data.username);
+
+    if(username == null)
     {
       throw new BadRequestError({ login_error: 'Неверно задан логин' });
     }
 
-    if(user.password != pass_data.password)
+    if(password != data.password)
     {
       throw new BadRequestError({ password_error: 'Неверно задан пароль' });
     }
     
     
-    const payload = { userName: user.userName, sub: user._id };
+    const payload = { username, sub: id };
     
-    const token = 
-    {
-      access_token: await this.jwtService.signAsync(payload),
-      
-    };
+    const token = await this.jwtService.signAsync(payload);
 
-    // TODO Попробовать без сохраненич а бд рефреш токена 
-    user.refreshToken = token.access_token;
-    user.save();
+    // TODO Попробовать без сохранения а бд рефреш токена 
     
+    this.userService.saveToken(id, JSON.stringify(token));
+
     return token; 
   }
 
+  // TODO сделать рефреш токен
   async refresh(dto: RefreshTokenDto)
   {
-    const user = await this.userService.FindOne(dto.userName);
-    if(user == null)
-    {
-      throw new BadRequestError({ message: 'Пользователь не найден' });
-    }
-    if(user.refreshToken != dto.refreshToken)
-    {
-      throw new BadRequestError({ message: 'Не совпадают токены' });
-    }
 
-    const payload = { userName: user.userName, sub: user._id };
-    
-    const token = 
-    {
-      access_token: await this.jwtService.signAsync(payload)
-    };
-    
-    
-    user.refreshToken = token.access_token;
-    user.save();
+    return true;
 
-    return token;
+    // const user = await this.userService.getUser(dto.userName);
+    // if(user == null)
+    // {
+    //   throw new BadRequestError({ message: 'Пользователь не найден' });
+    // }
+    // if(user.refreshToken != dto.refreshToken)
+    // {
+    //   throw new BadRequestError({ message: 'Не совпадают токены' });
+    // }
+
+    // const payload = { userName: user.userName, sub: user._id };
+    
+    // const token = 
+    // {
+    //   access_token: await this.jwtService.signAsync(payload)
+    // };
+    
+    
+    // user.refreshToken = token.access_token;
+    // user.save();
+
+    // return token;
 
   }
 }

@@ -12,7 +12,7 @@ export class PostgresService
   private options = {
     port: config.postgres.port, 
     host: config.postgres.host,
-    database: 'calories',
+    database: 'calories',         // TODO Вывести в конфиг
     user: 'admin',
     password: 'qwerty'
   };

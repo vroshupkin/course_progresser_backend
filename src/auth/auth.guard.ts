@@ -1,17 +1,15 @@
 import {
   CanActivate,
   ExecutionContext,
-  Inject,
   Injectable,
-  UnauthorizedException,
+  UnauthorizedException
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { IS_PUBLIC_KEY } from './constants';
-import { Request } from 'express';
 import { Reflector } from '@nestjs/core';
-import { UsersService } from '../users/users.service';
-import { Observable } from 'rxjs';
+import { JwtService } from '@nestjs/jwt';
+import { Request } from 'express';
 import { config } from '../config';
+import { UsersService } from '../users/users.service';
+import { IS_PUBLIC_KEY } from './constants';
 
 @Injectable()
 export class AdminGuard implements CanActivate 
@@ -51,7 +49,7 @@ export class AdminGuard implements CanActivate
     }
     
 
-    const role = await this.usersService.GetRole(request['user']['userName']);
+    const role = await this.usersService.getRole(request['user']['userName']);
 
     if(role !== 'admin')
     {

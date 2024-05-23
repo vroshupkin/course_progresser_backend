@@ -1,22 +1,13 @@
-import mongoose, { Model, Document } from 'mongoose';
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { User } from './users.schema';
-import { CreateDto,  UpdateUserDto } from './user.dto';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import { get_file_extension } from '../common/get_file_extension';
-import { validateDocument } from '../common/validators';
 import { PostgresService } from '../database/database.module';
-import { faker } from '@faker-js/faker';
-import { createHash } from 'node:crypto';
-import * as chalk from 'chalk';
+import { CreateDto } from './user.dto';
 
 @Injectable()
 export class UsersService
 {
   constructor(
-    @InjectModel(User.name)
-    private userModel: Model<User>,
     private pgService: PostgresService
   )
   {
@@ -25,131 +16,145 @@ export class UsersService
 
   async async_init()
   {
-    // const username = faker.internet.userName();
-    
-    // await this.pgService.client.query(`INSERT INTO "users" (username) VALUES ('${username}');`);
-    // const res = await this.pgService.client.query('SELECT * FROM "users"');
-    // console.log(res.rows);
-
-    console.log(await this.addUser('Hello epta', 'parol_epta'));
-
   }
 
-  async Create(request: CreateDto) 
-  {
-    const isUserFind = await this.FindOne(request.userName) != null;
+  async create({ username, password }: CreateDto) 
+  {    
+    if(!username || !password)
+    {
+      throw new BadRequestException('Имя пользователя и пароль должен быть передан');
+    }
+
+    const isUserFind = await this.getUser(username) != null;
 
     if(isUserFind)
     {
       throw new BadRequestException('Пользователь с таким именем уже существует');
     }
+ 
 
+    const query = `
+      DO $$
+        DECLARE
+          id_val INTEGER;
+          username_val VARCHAR = '${username}';
+          password_val VARCHAR = '${password}';
+        BEGIN
+          INSERT INTO users (username) VALUES (username_val);
 
-    const createUser = new this.userModel(request);
-    createUser.role = 'user';
-    
-    const schemaValidate = await validateDocument(createUser);
-    
-    if(schemaValidate.length > 0)
+          SELECT id INTO id_val FROM users WHERE users.username = username_val;
+
+          INSERT INTO usersauth (id, password) VALUES (id_val, password_val);
+      END $$;`;
+
+    this.pgService.client.query(query);
+
+    return 'ok';
+  }
+
+  async updatePassword(username: string, password: string)
+  {
+    if(this.getUser(username) === null)
+    {return;}
+
+    const query = `
+      DO $$
+        DECLARE
+          id_val INTEGER;
+        BEGIN
+          SELECT id INTO id_val FROM users WHERE users.username = ${username};
+          UPDATE usersauth SET password = ${password} WHERE id = id_val;
+      END $$;`;
+
+    await this.pgService.client.query(query);
+
+  }
+
+  async findAll() 
+  {
+    const query = 'SELECT * FROM users';
+    const res = await this.pgService.client.query(query);
+
+    res.rows.map(v => 
     {
-      throw new BadRequestException(schemaValidate);
+      const { username, id } = v;
+
+      return { username, id };
+    });
+    
+    return res.rows;
+  }
+
+  // TODO протестировать, отдает ли количество удаленных юзеров
+  async delete(userName: string): Promise<number>
+  {
+    const res = await this.getUser(userName);
+    if(!res)
+    {
+      return; 
+    }
+    const { id } = res;
+    
+    
+    await this.pgService.client.query(`DELETE FROM usersauth WHERE id=${id}`);
+    await this.pgService.client.query(`DELETE FROM users WHERE username='${userName}'`);
+    
+    
+    // TODO заменить
+    return 1;
+  }
+
+  async getRole(username: string)
+  {
+    const query = `SELECT role FRON users WHERE username=${username}`;
+    const res = await this.pgService.client.query(query);
+    
+    if(res.rows[0])
+    {
+      return res.rows[0].role;
     }
 
-    if(createUser.password.length < 6 || createUser.password.length > 32)
-    {
-      throw new BadRequestException('Пароль должен быть больше 6 символов и меньше 32');
-    }
-    
-    await createUser.save();
-    
-    return;
-    
-  }
+    return '';
 
-  async FindAll() 
-  {
-    return this.userModel.find().exec();
-  }
-
-
-  async FindOne(userName: string) 
-  {
-    const res = this.userModel.findOne({ userName: userName });
-    
-    
-    return  res;
-  }
-
-  async Update(updateUserDto: UpdateUserDto)
-  {
-    const res = this.userModel.updateOne({ userName: updateUserDto.userName }, updateUserDto);
-    
-    return res;
-  }
-
-  async Delete(userName: string)
-  {
-    const res = this.userModel.deleteOne({ userName });
-    
-    return res;
-  }
-
-  async GetRole(userName: string)
-  {
-    const res = await this.userModel.findOne({ userName });
-
-    if(res == null)
-    {
-      return null;
-    }
-    
-    return res.role;
   }
   
   /**
  * Получает пользователя со всеми полями
  */
-  async getUser(username?: string)
+  getUser = async (username: string): Promise<{username: string, password: string, id: number} | null> =>
   {
-    const query = 'SELECT * from "users"' + (username != undefined? `WHERE username =${username}` : '');
-    
-    return await this.pgService.client.query(query);
+    const query = `SELECT users.username, usersauth.password, users.id
+      FROM users
+      INNER JOIN usersauth ON usersauth.id = users.id
+      WHERE users.username = '${username}';`;
+
+    const res = await this.pgService.client.query(query);
+    if(!res.rows[0]){return null;}
+
+    const { password, id } = res.rows[0];  
+  
+    return { username, password, id };
+  };
+  
+  /** Сохраняет токен в постгрес */
+  async saveToken(user_id: number, token: string)
+  {
+    const query = `UPDATE usersauth SET token = '${token}' WHERE id='${user_id}'`;
+    await this.pgService.client.query(query);
   }
 
-  /**
- * Получает пользователя со всеми полями
- */
-  async addUser(username: string, password: string)
+  uploadAvatar(file: Express.Multer.File, userName: string)
   {
-
-    password += 'Hrani sol taino!';
-
-    const new_password = createHash('sha256').update(password).digest('hex');
+    if(!file){return;}
     
-
-    // @ts-ignore
-    const user_server_tittle  = [ chalk.green, chalk.bgBlack ].reduce((fn) => fn('UserSerivce addUser()\n'));
-
-    const message = user_server_tittle + chalk.redBright(new_password);
-    console.log(message);
-    // return await this.pgService.client.query(query);
-  }
-
-  UploadAvatar(file: Express.Multer.File, userName: string)
-  {
-    if(file)
+    if(!fs.existsSync('uploads')) 
     {
-      if(!fs.existsSync('uploads')) 
-      {
-        fs.mkdirSync('uploads');        
-      }
-
-      const file_extension = get_file_extension(file.originalname);
-      const fileName = `${userName}.${file_extension}`;
-      fs.writeFileSync(`uploads/${fileName}`, file.buffer);
-
-      
+      fs.mkdirSync('uploads');        
     }
+
+    const file_extension = get_file_extension(file.originalname);
+    const fileName = `${userName}.${file_extension}`;
+    fs.writeFileSync(`uploads/${fileName}`, file.buffer);
   }
 
   async GetAvatar(userName: string)
