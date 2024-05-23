@@ -87,3 +87,7 @@ docker exec -it calories-postgres-1 psql -U admin -W calories
 ```
 
 3. Вводим пароль
+
+# Swagger
+
+Сваггер находится по пути localhost:{port}/api
